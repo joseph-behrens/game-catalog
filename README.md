@@ -25,13 +25,12 @@ I've created my own users stories in the GitHub [issues log](https://github.com/
 
 ### Class Diagram
 
-<img src="readme-content/udacity-game-classes.png" width="500">
+![Class Diagram Image](readme-content/udacity-game-classes.png)
 
----
 
 ## Running the Application
 
-The application is hosted at [https://joebehrens.com](https://joebehrens.com) but if you woul like to run it on your own you can use the following instructions.
+The application is hosted at [https://joebehrens.com](https://joebehrens.com) but if you would like to run it on your own you can use the following instructions.
 
 _The below note is not applicable during Udacity review but the keys will be removed and changed after the project is accepted_
 ~~**The keys required to use OAuth are not included in source control. You will need to provide your own keys and setup your reply URLs within your accounts to use login.**~~
@@ -47,10 +46,9 @@ _The below note is not applicable during Udacity review but the keys will be rem
 
 - If you prefer to not use Vagrant.
     1. Download [Python](https://www.python.org/downloads/) and install it onto your own computer.
-    2. [PostgreSQL](https://www.postgresql.org/download/) will also be required if you decided to run without Vagrant.
-    3. This application requires Flask to be installed. This is used to make connections to the database from Python.
+    2. This application requires Flask to be installed. This is used to make connections to the database from Python.
         - First, ensure [pip](https://pip.pypa.io/en/stable/installing/) is installed
         - Then from your command shell run `pip install flask` .
-    4. Clone or download this repository to your computer.
-    5. Open a command shell and navigate to the directory you saved to.
-    6. Run the application using `python views.py`
+    3. Clone or download this repository to your computer.
+    4. Open a command shell and navigate to the directory you saved to.
+    5. Run the application using `python views.py`
