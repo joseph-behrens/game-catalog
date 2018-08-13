@@ -1,5 +1,5 @@
 from sqlalchemy import (Column, Integer, String, ForeignKey,
-                        DateTime, Numeric, create_engine)
+                        DateTime, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from passlib.apps import custom_app_context as pwd_context
@@ -70,7 +70,6 @@ class Developer(Company):
     __tablename__ = 'developer'
     id = Column(Integer, ForeignKey('company.id'), primary_key=True)
     __mapper_args__ = {'polymorphic_identity': 'developer'}
-    
 
 
 class System(Base):
@@ -128,7 +127,7 @@ class Game(Base):
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
     edited_date = Column(DateTime)
     year_released = Column(Integer)
-    average_rating = Column(Numeric)
+    average_rating = Column(String(3))
     image_id = Column(Integer, ForeignKey('image.id'))
     system_id = Column(Integer, ForeignKey('system.id'))
     owner_id = Column(Integer, ForeignKey('user.id'))
@@ -144,7 +143,7 @@ class Game(Base):
 
     @property
     def serialize(self):
-        """Use to return JSON formatted output."""        
+        """Use to return JSON formatted output."""
         return {
             'id': self.id,
             'title': self.title,

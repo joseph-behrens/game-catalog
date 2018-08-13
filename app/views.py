@@ -3,6 +3,7 @@ from flask import (Flask, render_template, request, redirect,
 from flask import session as login_session
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
 from models import (Base, Rating, Company, Manufacturer, Publisher,
                     Developer, System, User, Role, UserRole, Game,
                     GamePlatform)
@@ -17,18 +18,99 @@ import string
 
 app = Flask(__name__)
 
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    engine = create_engine('sqlite:///data/games.db')
+    Base.metadata.bind = engine
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
-# Connect to Database and create database session
-engine = create_engine('sqlite:///data/games.db')
-Base.metadata.bind = engine
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
 
 @app.route('/')
-def homePage():
-    developer = session.query(Company).filter_by(id=1).first()
-    return render_template('home.html', developer=developer)
+def default():
+    with session_scope() as session:
+        developer = session.query(Company).filter_by(id=1).first()
+        return render_template('default.html', developer=developer)
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+
+@app.route('/game/<int:game_id>')
+def game(game_id):
+    return render_template('game.html', game_id=game_id)
+
+
+@app.route('/game/new')
+def newGame():
+    return render_template('new-game.html')
+
+
+@app.route('/game/<int:game_id>/edit')
+def editGame(game_id):
+    return render_template('edit-game.html', game_id=game_id)
+
+
+@app.route('/game/<int:game_id>/delete')
+def deleteGame(game_id):
+    return render_template('delete-game.html', game_id=game_id)
+
+
+@app.route('/api/v1/games')
+def gamesList():
+    with session_scope() as session:
+        games = session.query(Game).all()
+        return jsonify(games=[game.serialize for game in games])
+
+
+@app.route('/api/v1/manufacturers')
+def manufacturerList():
+    with session_scope() as session:
+        manufacturers = session.query(Company).filter_by(
+            company_type='Manufacturer').all()
+        return jsonify(manufacturers=[
+                manufacturer.serialize for manufacturer in manufacturers])
+
+
+@app.route('/api/v1/publishers')
+def publisherList():
+    with session_scope() as session:
+        publishers = session.query(Company).filter_by(
+            company_type='Publisher').all()
+        return jsonify(publishers=[
+            publisher.serialize for publisher in publishers])
+
+
+@app.route('/api/v1/developers')
+def developerList():
+    with session_scope() as session:
+        developers = session.query(Company).filter_by(
+            company_type='Developer').all()
+        return jsonify(developers=[
+            developer.serialize for developer in developers])
+
+
+@app.route('/api/v1/systems')
+def systemList():
+    with session_scope() as session:
+        systems = session.query(Company).filter_by(company_type='System').all()
+        return jsonify(systems=[system.serialize for system in systems])
 
 
 if __name__ == '__main__':
