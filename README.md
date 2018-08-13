@@ -53,8 +53,9 @@ _The below note is not applicable during Udacity review but the keys will be rem
     4. Open a command shell and navigate to the folder where you cloned the repo and run `vagrant up`  
     This will take a few minutes the first time you run it.
     5. Once the machine is running run `vagrant ssh` from the same directory to log in to the computer.
-    6. To run the application from the vagrant ssh session run `python /vagrant/views.py`
+    6. To run the application from the vagrant ssh session run `python /vagrant/app/views.py`
     7. You can reach the application in a browser at [http://localhost:5000](http://localhost:5000)
+    8. To end the application press `Ctrl+c` in the shell and then run `vagrant halt` to stop the virtual machine.
 - If you prefer to not use Docker or Vagrant and want to run the application on your own machine:
     1. Download [Python](https://www.python.org/downloads/) and install it onto your own computer.
     2. Clone or download this repository to your computer.
@@ -65,3 +66,4 @@ _The below note is not applicable during Udacity review but the keys will be rem
         ```pip install --no-cache-dir -r requirements.txt```  
         This will install of the required Python packages for the application to run.
     5. Run the application using `python views.py`
+    6. To end the application press `Ctrl+c` in the shell.

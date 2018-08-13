@@ -24,3 +24,13 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+@app.route('/')
+def homePage():
+    developer = session.query(Company).filter_by(id=1).first()
+    return render_template('home.html', developer=developer)
+
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)
