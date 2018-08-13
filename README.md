@@ -35,20 +35,33 @@ The application is hosted at [https://joebehrens.com](https://joebehrens.com) bu
 _The below note is not applicable during Udacity review but the keys will be removed and changed after the project is accepted_
 ~~**The keys required to use OAuth are not included in source control. You will need to provide your own keys and setup your reply URLs within your accounts to use login.**~~
 
-- It is recommended to run the application from a preconfigured Vagrant virtual machine that contains Python and PostgreSQL pre-installed.
+- To run the application locally it's recommended to use Docker:
+    1. To install Docker you will first need to download and install for your operating system.  
+      a. [Mac](https://docs.docker.com/docker-for-mac/install/)  
+      b. [Windows](https://docs.docker.com/docker-for-windows/install/#install-docker-for-windows-desktop-app)  
+      c. [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+    2. If you're running Windows make sure to set Docker to run in [Linux Mode](https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers). Also, you will need to allow Docker to [access the drive](https://docs.docker.com/docker-for-windows/#shared-drives) where you'll clone this repo.
+    3. Clone or download this repo.
+    4. Open a command shell and navigate to the folder where you cloned the repo and run `docker-compose up --build`
+    5. With the container running you can reach the application in a browser at [http://localhost:5000](http://localhost:5000)
+    6. To stop the container press Ctrl+c in the shell and run `docker-compose down`
+
+- Another option is to use Vagrant:
     1. To install Vagrant you will first need to download and install [Virtual Box](https://www.virtualbox.org/wiki/Downloads)
     2. Download and install [Vagrant](https://www.vagrantup.com/downloads.html)
     3. Clone or download this repo.
-    4. Open a command shell and navigate to the folder where you cloned the repo and run `vagrant up` . This will take a few minutes the first time you run it.
+    4. Open a command shell and navigate to the folder where you cloned the repo and run `vagrant up`  
+    This will take a few minutes the first time you run it.
     5. Once the machine is running run `vagrant ssh` from the same directory to log in to the computer.
     6. To run the application from the vagrant ssh session run `python /vagrant/views.py`
-    7. You can reach the application in a browser at http://localhost:5000
-
-- If you prefer to not use Vagrant.
+    7. You can reach the application in a browser at [http://localhost:5000](http://localhost:5000)
+- If you prefer to not use Docker or Vagrant and want to run the application on your own machine:
     1. Download [Python](https://www.python.org/downloads/) and install it onto your own computer.
-    2. This application requires Flask to be installed. This is used to make connections to the database from Python.
-        - First, ensure [pip](https://pip.pypa.io/en/stable/installing/) is installed
-        - Then from your command shell run `pip install flask` .
-    3. Clone or download this repository to your computer.
-    4. Open a command shell and navigate to the directory you saved to.
+    2. Clone or download this repository to your computer.
+    3. Open a command shell and navigate to the directory you cloned the code into.
+    4. This application requires Flask and SqlAlchemy to be installed.
+        a. First, ensure [pip](https://pip.pypa.io/en/stable/installing/) is installed  
+        b. Then from your command shell in the cloned directory run  
+        ```pip install --no-cache-dir -r requirements.txt```  
+        This will install of the required Python packages for the application to run.
     5. Run the application using `python views.py`

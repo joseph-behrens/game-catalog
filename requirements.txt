@@ -1,0 +1,8 @@
+SQLAlchemy
+Flask
+oauth2client
+httplib2
+requests
+Flask-Login
+werkzeug
+passlib
