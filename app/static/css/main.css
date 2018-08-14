@@ -1,0 +1,29 @@
+html {
+    position: relative;
+    min-height: 100%;
+  }
+  body {
+    margin-bottom: 50px; /* Margin bottom by footer height */
+  }
+  .footer {
+    position: absolute;
+    bottom: 0;
+    height: 50px; /* Set the fixed height of the footer here */
+    line-height: 50px; /* Vertically center the text there */
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    border-color: black;
+  }
+
+  .social-lead {
+      margin-left: 60%;
+      padding-top: 15px;
+      font-size: 24px;
+  }
+
+  .social {
+      padding-left: 15px;
+      padding-top: 15px;
+      font-size: 24px;
+  }
+  

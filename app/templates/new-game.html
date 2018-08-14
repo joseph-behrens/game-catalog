@@ -2,5 +2,24 @@
 {% block content %}
 {% include "header.html" %}
     <h1>Create a New Game</h1>
+    <form method="POST" action="#">
+        <div class="form-group">
+            <label for="title">Game Title</label>
+            <input type="text" class="form-control" id="title" placeholder="Enter game title">
+        </div>
+        <div class="form-group">
+            <label for="description">Password</label>
+            <input type="text" class="form-control" id="description" placeholder="Description of the game's plot and gameplay">
+        </div>
+        <div class="form-group">
+            <label for="year_released">Release Year</label>
+            <input type="text" class="form-control" id="year_released" placeholder="Year the game was released">
+        </div>
+        <div class="form-group">
+            <label for="intial_rating">Rating</label>
+            <input type="number" class="form-control" id="intial_rating" min="1" max="5" step="1" placeholder="Rating 1 thru 5">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 {% include "footer.html" %}
 {% endblock %}
