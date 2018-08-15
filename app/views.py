@@ -4,7 +4,7 @@ from flask import session as login_session
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
-from models import (Base, Rating, Company, Manufacturer, Publisher,
+from models import (Base, Image, Rating, Company, Manufacturer, Publisher,
                     Developer, System, User, Role, UserRole, Game,
                     GamePlatform)
 from oauth2client.client import flow_from_clientsecrets
@@ -18,6 +18,7 @@ import string
 
 app = Flask(__name__)
 
+
 @contextmanager
 def session_scope():
     """Provide a transactional scope around a series of operations."""
@@ -28,7 +29,7 @@ def session_scope():
     try:
         yield session
         session.commit()
-    except:
+    except:  # noqa: E722
         session.rollback()
         raise
     finally:
@@ -57,9 +58,16 @@ def game(game_id):
     return render_template('game.html', game_id=game_id)
 
 
-@app.route('/game/new')
+@app.route('/game/new', methods=['GET','POST'])
 def newGame():
-    return render_template('new-game.html')
+    with session_scope() as session:
+        images = session.query(Image).all()
+        print(images[0].url)
+        if request.method == 'GET':
+            return render_template('new-game.html', images=images)
+        if request.method == 'POST':
+            return 'posted'
+
 
 
 @app.route('/game/<int:game_id>/edit')

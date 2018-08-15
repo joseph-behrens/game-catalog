@@ -2,24 +2,51 @@
 {% block content %}
 {% include "header.html" %}
     <h1>Create a New Game</h1>
-    <form method="POST" action="#">
+    <div id="error_message"></div>
+    <form method="POST" action="#" name="new_game" onsubmit="return validateForm()" autocomplete="off">
         <div class="form-group">
             <label for="title">Game Title</label>
             <input type="text" class="form-control" id="title" placeholder="Enter game title">
         </div>
         <div class="form-group">
             <label for="description">Password</label>
-            <input type="text" class="form-control" id="description" placeholder="Description of the game's plot and gameplay">
+            <input type="text" class="form-control" id="description" 
+            placeholder="Description of the game's plot and gameplay" required>
         </div>
         <div class="form-group">
             <label for="year_released">Release Year</label>
-            <input type="text" class="form-control" id="year_released" placeholder="Year the game was released">
+            <input type="text" class="form-control" id="year_released" 
+            placeholder="Year the game was released" required>
         </div>
         <div class="form-group">
             <label for="intial_rating">Rating</label>
-            <input type="number" class="form-control" id="intial_rating" min="1" max="5" step="1" placeholder="Rating 1 thru 5">
+            <input type="number" class="form-control" id="intial_rating" 
+            min="1" max="5" step="1" placeholder="Rating 1 thru 5" required>
+        </div>
+        <div class="form-group" id="image_drop_down">
+            <label for="image">Image</label>
+            <span class="btn btn-primary btn-sm" id="new_image_button" onclick="return showNewImageFields()">New Image</span>
+            <select class="form-control" id="image">
+                <option value="" disabled selected>Select an image</option>
+                {% for image in images %}
+                    <option value={{image.id}}>{{image.alt_text}} | {{image.url}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group new_image" id="new_image_text">
+            <label for="image_text">Image Name</label>
+            <span class="btn btn-primary btn-sm" id="new_image_button" onclick="return hideNewImageFields()">Select Existing Image</span>
+            <input class="form-control" id="image_text" placeholder="URL link to image for game art">
+            <small id="image_text_error" style="color:red"></small>
+        </div>
+        <div class="form-group new_image" id="new_image_url">
+            <label for="image_url">Image URL</label>
+            <input type="text"class="form-control" id="image_url" placeholder="URL link to image for game art">
+            <small id="image_url_error" style="color:red"></small>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+
+    <script src="{{ url_for('static', filename='js/new_game.js' ) }}"></script>
 {% include "footer.html" %}
 {% endblock %}
