@@ -62,11 +62,23 @@ def game(game_id):
 def newGame():
     with session_scope() as session:
         images = session.query(Image).all()
+        systems = session.query(System).all()
+        manufacturers = session.query(Manufacturer).all()
+        publishers = session.query(Publisher).all()
         print(images[0].url)
         if request.method == 'GET':
-            return render_template('new-game.html', images=images)
+            return render_template('new-game.html',
+                                    images=images,
+                                    systems=systems,
+                                    manufacturers=manufacturers,
+                                    publishers=publishers)
         if request.method == 'POST':
-            return 'posted'
+            game_title =  request.form["title"]
+            game_description =  request.form["description"]
+            game_release_year = request.form["year_released"]
+            game_rating = request.form["initial_rating"]
+            result = "{0}\n{1}\n{2}\n{3}".format(game_title, game_description, game_release_year, game_rating)
+            return result
 
 
 

@@ -1,8 +1,5 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
-<h1>Hello Docker!</h1>
-<p>{{developer.name}}</p>
-
-{% include "footer.html" %}
+    <h1 class="page_title">Game Catalog</h1>
+    <a href="{{ url_for('newGame') }}" class="btn btn-primary">Add a Game</a>
 {% endblock %}

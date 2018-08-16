@@ -65,7 +65,10 @@ class Publisher(Company):
 
 
 class Developer(Company):
-    """Game development companies such as Bethesda, BioWare, Valve, etc."""
+    """
+    Game development companies such as Bethesda, BioWare, Valve, etc.
+    Not currently used. But here as it is planned.
+    """
 
     __tablename__ = 'developer'
     id = Column(Integer, ForeignKey('company.id'), primary_key=True)
@@ -133,13 +136,11 @@ class Game(Base):
     owner_id = Column(Integer, ForeignKey('user.id'))
     editor_id = Column(Integer, ForeignKey('user.id'))
     publisher_id = Column(Integer, ForeignKey('publisher.id'))
-    developer_id = Column(Integer, ForeignKey('developer.id'))
     image = relationship(Image)
     system = relationship(System)
     owner = relationship(User, foreign_keys=[owner_id])
     editor = relationship(User, foreign_keys=[editor_id])
     publisher = relationship(Publisher)
-    developer = relationship(Developer)
 
     @property
     def serialize(self):

@@ -11,14 +11,21 @@ function validateForm() {
     }
 }
 
-function showNewImageFields() {
-    document.getElementById('image_drop_down').style.display = "none";
-    document.getElementById('new_image_text').style.display = "block";
-    document.getElementById('new_image_url').style.display = "block";
+function showNewEntryFields(type) {
+    document.getElementById(type + '_drop_down').style.display = "none";
+    var new_section = document.getElementsByClassName('new_' + type);
+    [].forEach.call(new_section, function(e){
+        e.style.display = "block";
+    });
 }
 
-function hideNewImageFields() {
-    document.getElementById('image_drop_down').style.display = "block";
-    document.getElementById('new_image_text').style.display = "none";
-    document.getElementById('new_image_url').style.display = "none";
+function hideNewEntryFields(type) {
+    document.getElementById(type + '_drop_down').style.display = "block";
+    var new_section = document.getElementsByClassName('new_' + type);
+    [].forEach.call(new_section, function(e){
+        e.style.display = "none";
+        for (var key in e.childNodes) {
+            e.childNodes[key].value = "";
+        }
+    });
 }
