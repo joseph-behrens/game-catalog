@@ -1,5 +1,6 @@
 # Custom
-*.db
+*.crt
+*.rsa
 .vscode
 
 

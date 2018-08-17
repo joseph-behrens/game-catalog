@@ -129,7 +129,7 @@ def developerList():
 @app.route('/api/v1/systems')
 def systemList():
     with session_scope() as session:
-        systems = session.query(Company).filter_by(company_type='System').all()
+        systems = session.query(System).all()
         return jsonify(systems=[system.serialize for system in systems])
 
 
