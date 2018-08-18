@@ -14,6 +14,7 @@ import json
 import requests
 import random
 import string
+import sys
 
 
 app = Flask(__name__)
@@ -77,10 +78,25 @@ def newGame():
             game_description =  request.form["description"]
             game_release_year = request.form["year_released"]
             game_rating = request.form["initial_rating"]
-            result = "{0}\n{1}\n{2}\n{3}".format(game_title, game_description, game_release_year, game_rating)
-            return result
+            game_image = session.query(Image).filter_by(id=request.form["image"]).first()
+            game_publisher = session.query(Company).filter_by(id=request.form["publisher"]).first()
+            game_system = session.query(System).filter_by(id=request.form["system"]).first()
 
+            game = Game(
+                   title=game_title,
+                   description=game_description,
+                   year_released=game_release_year,
+                   average_rating=game_rating,
+                   image_id=game_image.id,
+                   system_id=game_system.id,
+                   owner_id=1, # TODO: Change once logins are setup
+                   publisher_id=game_publisher.id
+                   )
 
+            session.add(game)
+            session.commit()
+
+            return redirect(url_for('default'))
 
 @app.route('/game/<int:game_id>/edit')
 def editGame(game_id):
@@ -91,7 +107,76 @@ def editGame(game_id):
 def deleteGame(game_id):
     return render_template('delete-game.html', game_id=game_id)
 
+# Image methods
+@app.route('/image/new', methods=['GET','POST'])
+def newImage():
+    with session_scope() as session:
+        if request.method == 'GET':
+            return render_template('new-image.html')
+        if request.method == 'POST':
+            image = Image(
+                    url=request.form["url"],
+                    alt_text=request.form["alt_text"]
+                    )
+            session.add(image)
+            session.commit()
+            return redirect(url_for('newGame'))
 
+
+@app.route('/publisher/new', methods=['GET','POST'])
+def newPublisher():
+    with session_scope() as session:
+        images = session.query(Image).all()
+        if request.method == 'GET':
+            return render_template('new-publisher.html', images=images)
+        if request.method == 'POST':
+            publisher = Publisher(
+                        name=request.form["publisher_name"],
+                        country=request.form["publisher_country"],
+                        image_id=request.form["publisher_image"]
+                        )
+            session.add(publisher)
+            session.commit()
+            return redirect(url_for('newGame'))
+
+
+@app.route('/system/new', methods=['GET','POST'])
+def newSystem():
+    with session_scope() as session:
+        images = session.query(Image).all()
+        manufacturers = session.query(Manufacturer).all()
+        if request.method == 'GET':
+            return render_template('new-system.html', images=images, manufacturers=manufacturers)
+        if request.method == 'POST':
+            system = System(
+                        name=request.form["system_name"],
+                        image_id=request.form["system_image"],
+                        year_released=request.form["system_release_year"],
+                        description=request.form["system_description"]
+                        )
+            session.add(system)
+            session.commit()
+            return redirect(url_for('newGame'))
+
+
+@app.route('/manufacturer/new', methods=['GET','POST'])
+def newManufacturer():
+    with session_scope() as session:
+        images = session.query(Image).all()
+        if request.method == 'GET':
+            return render_template('new-manufacturer.html', images=images)
+        if request.method == 'POST':
+            manufacturer = Manufacturer(
+                        name=request.form["manufacturer_name"],
+                        country=request.form["manufacturer_country"],
+                        image_id=request.form["manufacturer_image"]
+                        )
+            session.add(manufacturer)
+            session.commit()
+            return redirect(url_for('newGame'))
+
+
+# API Calls
 @app.route('/api/v1/games')
 def gamesList():
     with session_scope() as session:

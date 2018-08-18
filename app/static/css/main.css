@@ -67,26 +67,6 @@ fieldset {
   align-items: right;
 }
 
-.new_image {
-  display: none;
-}
-
-.new_system {
-  display: none;
-}
-
-.new_system_image {
-  display: none;
-}
-
-.new_publisher {
-  display: none;
-}
-
-.new_publisher_image {
-  display: none;
-}
-
 .form_error {
   color: red;
 }
