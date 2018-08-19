@@ -109,16 +109,52 @@ def newGame():
             return redirect(url_for('default'))
 
 
-@app.route('/game/<int:game_id>/edit')
+@app.route('/game/<int:game_id>/edit', methods=['GET','POST'])
 def editGame(game_id):
     with session_scope() as session:
         game = session.query(Game).filter_by(id=game_id).first()
-        return render_template('edit-game.html', game=game)
+        if request.method == 'GET':
+            images = session.query(Image).order_by(Image.alt_text).all()
+            systems = session.query(System).order_by(System.name).all()
+            manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
+            publishers = session.query(Publisher).order_by(Publisher.name).all()
+            return render_template('edit-game.html',
+                                    game=game,
+                                    images=images,
+                                    systems=systems,
+                                    manufacturers=manufacturers,
+                                    publishers=publishers)
+                                    
+        if request.method == 'POST':
+            game.title =  request.form["title"]
+            game.description =  request.form["description"]
+            game.year_released = request.form["year_released"]
+            game.average_rating = request.form["initial_rating"]
+
+            game_image = session.query(Image).filter_by(id=request.form["image"]).first()
+            game_publisher = session.query(Company).filter_by(id=request.form["publisher"]).first()
+            game_system = session.query(System).filter_by(id=request.form["system"]).first()
+
+            game.image_id=game_image.id
+            game.system_id=game_system.id
+            game.owner_id=1 # TODO: Change once logins are setup
+            game.publisher_id=game_publisher.id
+
+            session.add(game)
+            session.commit()
+            return redirect(url_for('game', game_id=game.id))
 
 
-@app.route('/game/<int:game_id>/delete')
+@app.route('/game/<int:game_id>/delete', methods=['GET','POST'])
 def deleteGame(game_id):
-    return render_template('delete-game.html', game_id=game_id)
+    with session_scope() as session:
+        game = session.query(Game).filter_by(id=game_id).first()
+        if request.method == 'GET':
+            return render_template('delete-game.html', game=game)
+        if request.method == 'POST':
+            session.delete(game)
+            session.commit()
+            return redirect(url_for('default'))
 
 # Image methods
 @app.route('/image/new', methods=['GET','POST'])
