@@ -1,96 +1,80 @@
 html {
-    position: relative;
-    min-height: 100%;
+  position: relative;
+  min-height: 100%;
 }
 
 body {
-  margin-bottom: 50px; /* Margin bottom by footer height */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-image: url("https://images3.alphacoders.com/239/thumb-1920-239007.jpg");
+margin-bottom: 50px; /* Margin bottom by footer height */
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-image: url("https://images3.alphacoders.com/239/thumb-1920-239007.jpg");
 }
 
 h1 {
-  font-weight: lighter;
+font-weight: lighter;
 }
 
 fieldset {
-  margin-top: 20px;
-  border-width: thin;
-  border-color: darkgrey;
-  border-style: solid;
-  padding: 10px;
+margin-top: 20px;
+border-width: thin;
+border-color: darkgrey;
+border-style: solid;
+padding: 10px;
 }
 
 .jumbotron {
-  margin-top: 50px;
+margin-top: 50px;
 }
 
 .navbar {
-  width: 100%;
-  position: fixed;
-  background-color: rgb(208, 224, 245);
-  border: none;
+width: 100%;
+position: fixed;
+background-color: rgb(208, 224, 245);
+border: none;
 }
 
 .btn {
-  background-color: lightsteelblue;
+background-color: lightsteelblue;
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  height: 50px; /* Set the fixed height of the footer here */
-  line-height: 50px; /* Vertically center the text there */
-  background-color: rgb(208, 224, 245);
-  border-radius: 5px;
-  border-color: black;
-  width: 100%;
+position: absolute;
+bottom: 0;
+height: 50px; /* Set the fixed height of the footer here */
+line-height: 50px; /* Vertically center the text there */
+background-color: rgb(208, 224, 245);
+border-radius: 5px;
+border-color: black;
+width: 100%;
 }
 
 .social-lead {
-    margin-left: 68%;
-    padding-top: 15px;
-    font-size: 24px;
+  margin-left: 68%;
+  padding-top: 15px;
+  font-size: 24px;
 }
 
 .social {
-    padding-left: 15px;
-    padding-top: 15px;
-    font-size: 24px;
+  padding-left: 15px;
+  padding-top: 15px;
+  font-size: 24px;
 }
 
 .btn-sm {
-  font-size: 8px;
-  float: right;
-  margin-top: 5px;
-  padding: 0;
-  align-items: right;
-}
-
-.new_image {
-  display: none;
-}
-
-.new_system {
-  display: none;
-}
-
-.new_system_image {
-  display: none;
-}
-
-.new_publisher {
-  display: none;
-}
-
-.new_publisher_image {
-  display: none;
-}
-
-.form_error {
-  color: red;
+font-size: 8px;
+float: right;
+margin-top: 5px;
+padding: 0;
+align-items: right;
 }
 
 .page_title {
-  text-align: center;
+text-align: center;
+}
+
+.dark_hr {
+border: none;
+height: 1px;
+/* Set the hr color */
+color: #333; /* old IE */
+background-color: #333; /* Modern Browsers */
 }

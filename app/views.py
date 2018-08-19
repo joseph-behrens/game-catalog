@@ -40,8 +40,9 @@ def session_scope():
 @app.route('/')
 def default():
     with session_scope() as session:
-        developer = session.query(Company).filter_by(id=1).first()
-        return render_template('default.html', developer=developer)
+        top_games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.average_rating.desc()).limit(3)
+        games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.title)
+        return render_template('default.html', top_games=top_games, games=games)
 
 
 @app.route('/login')
