@@ -1,0 +1,8 @@
+{% extends "main.html" %}
+{% block content %}
+<a href="{{ url_for('editSystem', system_id=system[0].id) }}"><button class="btn btn-primary">Edit</button></a>
+    <h1 class="page_title">{{system[0].name}}</h1>
+    <div align="center"><img src="{{system[1].url}}" alt="{{system[1].alt_text}}" width="25%"></div>
+    <hr class="dark_hr">
+    {% include "game-list.html" %}
+{% endblock %}

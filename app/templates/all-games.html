@@ -1,0 +1,7 @@
+{% extends "main.html" %}
+{% block content %}
+<a href="{{ url_for('newGame') }}"><button class="btn btn-primary">Add a Game</button></a>
+    <h1 class="page_title">All Games</h1>
+    <hr class="dark_hr">
+    {% include "game-list.html" %}
+{% endblock %}

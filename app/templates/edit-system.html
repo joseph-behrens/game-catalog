@@ -1,0 +1,43 @@
+{% extends "main.html" %}
+{% block content %}
+<h1 class="page_title">Edit {{system.name}}</h1>
+<hr>
+<form method="POST" action="#" id="new_system" onsubmit="return validateForm()" autocomplete="off">
+<div class="form-group new_system">
+        <label for="system_name">System Name</label>
+        <input class="form-control" name="system_name" placeholder="Name of the new system being added">
+    </div>
+    <div class="form-group new_system">
+        <label for="manufacturer">Manufacturer</label>
+        <select class="form-control" name="manufacturer">
+            <option value="" disabled selected>Select the game system's manufacturer</option>
+            {% for manufacturer in manufacturers %}
+                <option value={{manufacturer.id}}>{{manufacturer.name}}</option>
+            {% endfor %}
+        </select>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('newManufacturer') }}">New Manufacturer</a>
+    </div>
+    <div class="form-group new_system">
+        <label for="system_description">System Description</label>
+        <input class="form-control" name="system_description" placeholder="Description of the new system being added">
+        <small class="form_error" id="system_description_error"></small>
+    </div>
+    <div class="form-group new_system">
+        <label for="system_release_year">System Release Year</label>
+        <input class="form-control" name="system_release_year" placeholder="Year the system was released">
+    </div>
+    <div class="form-group new_system" id="system_image_drop_down">
+        <label for="image">Game System Logo</label>
+        <select class="form-control" name="system_image">
+            <option value="" disabled selected>Select an image</option>
+            {% for image in images %}
+                <option value={{image.id}}>{{image.alt_text}}</option>
+            {% endfor %}
+        </select>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('newImage') }}">New Image</a>
+    </div>
+    </fieldset>
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

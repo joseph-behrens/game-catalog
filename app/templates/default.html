@@ -35,36 +35,17 @@
             </div>
         {% endfor %}
     </div>
-    <h2 class="page_title" id="recently_added">Recently Added</h2>
+    <h2 class="page_title section">Recently Added</h2>
+    <hr class="dark_hr">
+    {% include "game-list.html" %}
+    <h2 class="page_title section">View Games by System</h2>
     <hr class="dark_hr">
     <div class="row">
-        {% for game in games %}
-            <div class="col-md-3" align="center">
-                <a href="{{ url_for('game', game_id=game[0].id) }}"><h6>{{game[0].title}}</h6></a>
-                <p>
-                    {% if game[0].average_rating == 1 %}
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 2 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 3 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 4 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 5 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% endif %}
-                </p>
-                <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="50" height="50">
+        {% for system in systems %}
+            <div class="col-md-3 row-top-buffer" align="center">
+                <a href="{{ url_for('gamesBySystem', system_id=system[0].id) }}">
+                <img src="{{system[1].url}}" alt="{{system[1].alt_text}}" height="50px" max-width="75%">
+                <h6>{{system[0].name}}</h6></a>
             </div>
         {% endfor %}
     </div>

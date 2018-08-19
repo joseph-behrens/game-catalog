@@ -42,7 +42,8 @@ def default():
     with session_scope() as session:
         top_games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.average_rating.desc()).limit(3)
         games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.created_date.desc()).limit(10)
-        return render_template('default.html', top_games=top_games, games=games)
+        systems = session.query(System,Image).filter(System.image_id == Image.id).all()
+        return render_template('default.html', top_games=top_games, games=games, systems=systems)
 
 
 @app.route('/login')
@@ -54,6 +55,13 @@ def login():
 def admin():
     return render_template('admin.html')
 
+
+@app.route('/game')
+def allGames():
+    with session_scope() as session:
+        games = session.query(Game,Image,System,Company).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).all()
+        return render_template('all-games.html', games=games)
+        
 
 @app.route('/game/<int:game_id>')
 def game(game_id):
@@ -98,8 +106,8 @@ def newGame():
 
             session.add(game)
             session.commit()
-
             return redirect(url_for('default'))
+
 
 @app.route('/game/<int:game_id>/edit')
 def editGame(game_id):
@@ -145,6 +153,14 @@ def newPublisher():
             return redirect(url_for('newGame'))
 
 
+@app.route('/system/<int:system_id>')
+def gamesBySystem(system_id):
+    with session_scope() as session:
+        system = session.query(System,Image).filter(System.image_id == Image.id).filter_by(id=system_id).first()
+        games = session.query(Game,Image).filter(Game.image_id == Image.id).filter(Game.system_id == system_id).all()
+        return render_template('system.html', system=system, games=games)
+
+
 @app.route('/system/new', methods=['GET','POST'])
 def newSystem():
     with session_scope() as session:
@@ -162,6 +178,13 @@ def newSystem():
             session.add(system)
             session.commit()
             return redirect(url_for('newGame'))
+
+
+@app.route('/system/<int:system_id>/edit')
+def editSystem(system_id):
+    with session_scope() as session:
+        system = session.query(System).filter_by(id=system_id).first()
+        return render_template('edit-system.html', system=system)
 
 
 @app.route('/manufacturer/new', methods=['GET','POST'])
