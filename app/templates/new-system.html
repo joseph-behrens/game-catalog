@@ -31,7 +31,7 @@
         <select class="form-control" name="system_image">
             <option value="" disabled selected>Select an image</option>
             {% for image in images %}
-                <option value={{image.id}}>{{image.alt_text}} | {{image.url}}</option>
+                <option value={{image.id}}>{{image.alt_text}}</option>
             {% endfor %}
         </select>
         <a class="btn btn-primary btn-sm" href="{{ url_for('newImage') }}">New Image</a>

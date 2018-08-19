@@ -1,7 +1,7 @@
 from flask import (Flask, render_template, request, redirect,
                    jsonify, url_for, flash, make_response)
 from flask import session as login_session
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from models import (Base, Image, Rating, Company, Manufacturer, Publisher,
@@ -41,7 +41,7 @@ def session_scope():
 def default():
     with session_scope() as session:
         top_games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.average_rating.desc()).limit(3)
-        games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.title)
+        games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.created_date.desc()).limit(10)
         return render_template('default.html', top_games=top_games, games=games)
 
 
@@ -57,16 +57,18 @@ def admin():
 
 @app.route('/game/<int:game_id>')
 def game(game_id):
-    return render_template('game.html', game_id=game_id)
+    with session_scope() as session:
+        game = session.query(Game,Image,System,Company).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).filter_by(id=game_id).first()
+        return render_template('game.html', game=game)
 
 
 @app.route('/game/new', methods=['GET','POST'])
 def newGame():
     with session_scope() as session:
-        images = session.query(Image).all()
-        systems = session.query(System).all()
-        manufacturers = session.query(Manufacturer).all()
-        publishers = session.query(Publisher).all()
+        images = session.query(Image).order_by(Image.alt_text).all()
+        systems = session.query(System).order_by(System.name).all()
+        manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
+        publishers = session.query(Publisher).order_by(Publisher.name).all()
         print(images[0].url)
         if request.method == 'GET':
             return render_template('new-game.html',
@@ -101,7 +103,9 @@ def newGame():
 
 @app.route('/game/<int:game_id>/edit')
 def editGame(game_id):
-    return render_template('edit-game.html', game_id=game_id)
+    with session_scope() as session:
+        game = session.query(Game).filter_by(id=game_id).first()
+        return render_template('edit-game.html', game=game)
 
 
 @app.route('/game/<int:game_id>/delete')
@@ -127,7 +131,7 @@ def newImage():
 @app.route('/publisher/new', methods=['GET','POST'])
 def newPublisher():
     with session_scope() as session:
-        images = session.query(Image).all()
+        images = session.query(Image).order_by(Image.alt_text).all()
         if request.method == 'GET':
             return render_template('new-publisher.html', images=images)
         if request.method == 'POST':
@@ -144,8 +148,8 @@ def newPublisher():
 @app.route('/system/new', methods=['GET','POST'])
 def newSystem():
     with session_scope() as session:
-        images = session.query(Image).all()
-        manufacturers = session.query(Manufacturer).all()
+        images = session.query(Image).order_by(Image.alt_text).all()
+        manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
         if request.method == 'GET':
             return render_template('new-system.html', images=images, manufacturers=manufacturers)
         if request.method == 'POST':
@@ -163,7 +167,7 @@ def newSystem():
 @app.route('/manufacturer/new', methods=['GET','POST'])
 def newManufacturer():
     with session_scope() as session:
-        images = session.query(Image).all()
+        images = session.query(Image).order_by(Image.alt_text).all()
         if request.method == 'GET':
             return render_template('new-manufacturer.html', images=images)
         if request.method == 'POST':

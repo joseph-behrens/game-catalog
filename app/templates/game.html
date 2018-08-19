@@ -1,6 +1,44 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
-    <h1>Game {{game_id}} Page</h1>
-{% include "footer.html" %}
+<a href="{{ url_for('editGame', game_id=game[0].id) }}"><button class="btn btn-primary">Edit</button></a>
+<a href="{{ url_for('deleteGame', game_id=game[0].id) }}"><button class="btn btn-primary">Delete</button></a>
+    <h1 class="page_title">{{game[0].title}}</h1>
+    <hr class="dark_hr">
+    <div class="row">
+        <div class="col-md-6">
+            <p>
+                    {% if game[0].average_rating == 1 %}
+                        <i class="fa fa-star fa-4x"></i>
+                    {% elif game[0].average_rating == 2 %}
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                    {% elif game[0].average_rating == 3 %}
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                    {% elif game[0].average_rating == 4 %}
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                    {% elif game[0].average_rating == 5 %}
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                        <i class="fa fa-star fa-4x"></i>
+                    {% endif %}
+                </p>
+            <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="100%">
+        </div>
+        <div class="col-md-6">
+            <h2>System: {{game[2].name}}</h3>
+            <h3>Publisher: {{game[3].name}}</h3>
+            <h4>Description: {{game[0].description}}</h4>
+            <h4>Article Created: {{game[0].created_date}}</h4>
+            <h4>Creator: {{game[0].owner_id}}</h4>
+            <h4>Edited on: {{game[0].edited_date}}</h4>
+            <h4>Editor: {{game[0].editor_id}}</h4>
+        </div>
+    </div>
 {% endblock %}

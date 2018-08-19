@@ -30,6 +30,11 @@ fieldset {
   position: fixed;
   background-color: rgb(208, 224, 245);
   border: none;
+  z-index: 1;
+}
+
+.navbar-brand {
+  font-size: 32px;
 }
 
 .btn {
@@ -45,6 +50,10 @@ fieldset {
   border-radius: 5px;
   border-color: black;
   width: 100%;
+}
+
+.fa-star {
+  color: #a17f1a;
 }
 
 .social-lead {
@@ -71,10 +80,15 @@ fieldset {
   text-align: center;
 }
 
+
 .dark_hr {
   border: none;
   height: 1px;
   /* Set the hr color */
   color: #333; /* old IE */
   background-color: #333; /* Modern Browsers */
+}
+
+#recently_added {
+  margin-top: 100px;
 }

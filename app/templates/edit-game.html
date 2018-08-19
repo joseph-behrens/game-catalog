@@ -1,6 +1,70 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
-    <h1>Edit Game {{game_id}} Page</h1>
-{% include "footer.html" %}
+    <h1 class="page_title">Edit {{game.title}}</h1>
+    <hr class="dark_hr">
+    <form method="POST" action="#" id="new_game" onsubmit="return validateForm()" autocomplete="off">
+            <fieldset>
+                <legend>Game Info</legend>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" name="title" placeholder="Enter game title">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" name="description" 
+                    placeholder="Description of the game's plot and gameplay" required>
+                </div>
+                <div class="form-group">
+                    <label for="year_released">Release Year</label>
+                    <input type="text" class="form-control" name="year_released" 
+                    placeholder="Year the game was released" required>
+                </div>
+                <div class="form-group">
+                    <label for="intial_rating">Rating</label>
+                    <input type="number" class="form-control" name="initial_rating" 
+                    min="1" max="5" step="1" placeholder="Rating 1 thru 5" required>
+                </div>
+            </fieldset>
+        
+            <fieldset>
+                <legend>Game Image</legend>
+                <div class="form-group" id="image_drop_down">
+                    <select class="form-control" name="image">
+                        <option value="" disabled selected>Select an image</option>
+                        {% for image in images %}
+                            <option value={{image.id}}>{{image.alt_text}}</option>
+                        {% endfor %}
+                    </select>
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('newImage') }}">New Image</a>
+                </div>
+            </fieldset>
+        
+            <fieldset>
+                <legend>Game Publisher</legend>
+                <div class="form-group" id="publisher_drop_down">
+                    <select class="form-control" name="publisher">
+                        <option value="" disabled selected>Select the game system</option>
+                        {% for publisher in publishers %}
+                            <option value={{publisher.id}}>{{publisher.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('newPublisher') }}">New Publisher</a>
+                </div>
+            </fieldset>
+        
+            <fieldset>
+                <legend>Game System</legend>
+                <div class="form-group" id="system_drop_down">                
+                    <select class="form-control" name="system">
+                        <option value="" disabled selected>Select the game system</option>
+                        {% for system in systems %}
+                            <option value={{system.id}}>{{system.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('newSystem') }}">New System</a>
+                </div>
+            </fieldset>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 {% endblock %}
