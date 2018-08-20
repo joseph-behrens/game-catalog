@@ -156,6 +156,7 @@ def deleteGame(game_id):
             session.commit()
             return redirect(url_for('default'))
 
+
 # Image methods
 @app.route('/image/new', methods=['GET','POST'])
 def newImage():
@@ -169,7 +170,40 @@ def newImage():
                     )
             session.add(image)
             session.commit()
-            return redirect(url_for('newGame'))
+            return redirect(url_for('allImages'))
+
+
+@app.route('/image')
+def allImages():
+    with session_scope() as session:
+        images = session.query(Image).order_by(Image.alt_text).all()
+        return render_template('all-images.html', images=images)
+
+
+@app.route('/image/<int:image_id>/edit', methods=['GET','POST'])
+def editImage(image_id):
+    with session_scope() as session:
+        image = session.query(Image).filter_by(id=image_id).first()
+        if request.method == 'GET':
+            return render_template('edit-image.html', image=image)
+        if request.method == 'POST':
+            image.alt_text = request.form['alt_text']
+            image.url = request.form['url']
+            session.add(image)
+            session.commit()
+            return redirect(url_for('allImages'))
+
+
+@app.route('/image/<int:image_id>/delete', methods=['GET','POST'])
+def deleteImage(image_id):
+    with session_scope() as session:
+        image = session.query(Image).filter_by(id=image_id).first()
+        if request.method == 'GET':
+            return render_template('delete-image.html', image=image)
+        if request.method == 'POST':
+            session.delete(image)
+            session.commit()
+            return redirect(url_for('allImages'))
 
 
 @app.route('/publisher/new', methods=['GET','POST'])

@@ -97,3 +97,13 @@ fieldset {
 .row-top-buffer { 
   margin-top:20px; 
 }
+
+.table-row {
+  display: flex;
+}
+
+.box {
+  height: 100px;
+  vertical-align: text-bottom;
+  margin-bottom: 30px;
+}

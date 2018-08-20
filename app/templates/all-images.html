@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+<a href="{{ url_for('newImage') }}"><button class="btn btn-primary">Add an Image</button></a>
+    <h1 class="page_title">All Images</h1>
+    <hr class="dark_hr">
+    <div class="row row-top-buffer">
+    {% for image in images %}
+        <div class="col-md-2 box">
+            <a href="{{ url_for('editImage', image_id=image.id) }}">
+                <img src="{{image.url}}" alt="{{image.alt_text}}" width="50px">
+                <h6>{{image.alt_text}}</h6>
+            </a>
+        </div>
+    {% endfor %}
+    </div> 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.matchHeight/0.7.0/jquery.matchHeight-min.js"></script>
+    <script>
+        $(function() {
+            $('.box').matchHeight();
+        });
+    </script>
+{% endblock %}

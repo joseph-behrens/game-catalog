@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% block content %}
+<h1 class="page_title">Edit Image {{image.alt_text}}</h1>
+<hr>
+<form method="POST" action="#" autocomplete="off">
+    <div class="form-group">
+        <label for="alt_text">Image Name</label>
+        <input class="form-control" name="alt_text" value="{{image.alt_text}}" required>
+    </div>
+    <div class="form-group">
+        <label for="image_url">Image URL</label>
+        <input type="text"class="form-control" name="url" value="{{image.url}}" required>
+    </div>
+    <br>
+    <img src="{{ image.url }}" alt="{{ image.alt_text }}"><br><br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a class="btn btn-danger" href="{{ url_for('deleteImage', image_id=image.id) }}">Delete</a>
+</form>
+{% endblock %}
