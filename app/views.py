@@ -56,6 +56,7 @@ def admin():
     return render_template('admin.html')
 
 
+#region Game Methods
 @app.route('/game')
 def allGames():
     with session_scope() as session:
@@ -155,9 +156,10 @@ def deleteGame(game_id):
             session.delete(game)
             session.commit()
             return redirect(url_for('default'))
+#endregion
 
 
-# Image methods
+#region Image Methods
 @app.route('/image/new', methods=['GET','POST'])
 def newImage():
     with session_scope() as session:
@@ -204,8 +206,10 @@ def deleteImage(image_id):
             session.delete(image)
             session.commit()
             return redirect(url_for('allImages'))
+#endregion
 
 
+#region Publisher Methods
 @app.route('/publisher/new', methods=['GET','POST'])
 def newPublisher():
     with session_scope() as session:
@@ -220,9 +224,46 @@ def newPublisher():
                         )
             session.add(publisher)
             session.commit()
-            return redirect(url_for('newGame'))
+            return redirect(url_for('allPublishers'))
 
 
+@app.route('/publisher')
+def allPublishers():
+    with session_scope() as session:
+        publishers = session.query(Publisher,Image).filter(Publisher.image_id == Image.id).order_by(Publisher.name).all()
+        return render_template('all-publishers.html', publishers=publishers)
+
+
+@app.route('/publisher/<int:publisher_id>/edit', methods=['GET','POST'])
+def editPublisher(publisher_id):
+    with session_scope() as session:
+        publisher = session.query(Publisher).filter_by(id=publisher_id).first()
+        images = session.query(Image).order_by(Image.alt_text).all()
+        if request.method == 'GET':
+            return render_template('edit-publisher.html', publisher=publisher, images=images)
+        if request.method == 'POST':
+            publisher.name = request.form['publisher_name']
+            publisher.country = request.form['publisher_country']
+            publisher.image_id = request.form['publisher_image']
+            session.add(publisher)
+            session.commit()
+            return redirect(url_for('allPublishers'))
+
+
+@app.route('/publisher/<int:publisher_id>/delete', methods=['GET','POST'])
+def deletePublisher(publisher_id):
+    with session_scope() as session:
+        publisher = session.query(Publisher).filter_by(id=publisher_id).first()
+        if request.method == 'GET':
+            return render_template('delete-publisher.html', publisher=publisher)
+        if request.method == 'POST':
+            session.delete(publisher)
+            session.commit()
+            return redirect(url_for('allPublishers'))
+#endregion
+
+
+#region System Methods
 @app.route('/system/<int:system_id>')
 def gamesBySystem(system_id):
     with session_scope() as session:
@@ -247,16 +288,49 @@ def newSystem():
                         )
             session.add(system)
             session.commit()
-            return redirect(url_for('newGame'))
+            return redirect(url_for('allSystems'))
 
 
-@app.route('/system/<int:system_id>/edit')
+@app.route('/system')
+def allSystems():
+    with session_scope() as session:
+        systems = session.query(System,Image).filter(System.image_id == Image.id).order_by(System.name).all()
+        return render_template('all-systems.html', systems=systems)
+
+
+@app.route('/system/<int:system_id>/edit', methods=['GET','POST'])
 def editSystem(system_id):
     with session_scope() as session:
         system = session.query(System).filter_by(id=system_id).first()
-        return render_template('edit-system.html', system=system)
+        if request.method == 'GET':
+            manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
+            images = session.query(Image).order_by(Image.alt_text).all()
+            return render_template('edit-system.html', system=system, manufacturers=manufacturers, images=images)
+        if request.method == 'POST':
+            system.name = request.form['system_name']
+            system.manufacturer_id = request.form['manufacturer']
+            system.description = request.form['system_description']
+            system.year_released = request.form['system_release_year']
+            system.image_id = request.form['system_image']
+            session.add(system)
+            session.commit()
+            return redirect(url_for('allSystems'))
 
 
+@app.route('/system/<int:system_id>/delete', methods=['GET','POST'])
+def deleteSystem(system_id):
+    with session_scope() as session:
+        system = session.query(System).filter_by(id=system_id).first()
+        if request.method == 'GET':
+            return render_template('delete-system.html', system=system)
+        if request.method == 'POST':
+            session.delete(system)
+            session.commit()
+            return redirect(url_for('allSystems'))
+#endregion
+
+
+#region Manufacturer Methods
 @app.route('/manufacturer/new', methods=['GET','POST'])
 def newManufacturer():
     with session_scope() as session:
@@ -267,14 +341,52 @@ def newManufacturer():
             manufacturer = Manufacturer(
                         name=request.form["manufacturer_name"],
                         country=request.form["manufacturer_country"],
-                        image_id=request.form["manufacturer_image"]
+                        image_id=request.form["manufacturer_image"],
+                        year_founded=request.form["year_founded"]
                         )
             session.add(manufacturer)
             session.commit()
-            return redirect(url_for('newGame'))
+            return redirect(url_for('allManufacturers'))
 
 
-# API Calls
+@app.route('/manufacturer')
+def allManufacturers():
+    with session_scope() as session:
+        manufacturers = session.query(Manufacturer,Image).filter(Manufacturer.image_id == Image.id).all()
+        return render_template('all-manufacturers.html', manufacturers=manufacturers)
+
+
+@app.route('/manufacturer/<int:manufacturer_id>/edit', methods=['GET','POST'])
+def editManufacturer(manufacturer_id):
+    with session_scope() as session:
+        manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
+        if request.method == 'GET':
+            images = session.query(Image).order_by(Image.alt_text).all()
+            return render_template('edit-manufacturer.html', manufacturer=manufacturer, images=images)
+        if request.method == 'POST':
+            manufacturer.name = request.form['manufacturer_name']
+            manufacturer.country = request.form['manufacturer_country']
+            manufacturer.year_founded = request.form['year_founded']
+            manufacturer.image_id = request.form['manufacturer_image']
+            session.add(manufacturer)
+            session.commit()
+            return redirect(url_for('allManufacturers'))
+
+
+@app.route('/manufacturer/<int:manufacturer_id>/delete', methods=['GET','POST'])
+def deleteManufacturer(manufacturer_id):
+    with session_scope() as session:
+        manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
+        if request.method == 'GET':
+            return render_template('delete-manufacturer.html', manufacturer=manufacturer)
+        if request.method == 'POST':
+            session.delete(manufacturer)
+            session.commit()
+            return redirect(url_for('allManufacturers'))
+#endregion
+
+
+#region API Calls
 @app.route('/api/v1/games')
 def gamesList():
     with session_scope() as session:
@@ -314,6 +426,7 @@ def systemList():
     with session_scope() as session:
         systems = session.query(System).all()
         return jsonify(systems=[system.serialize for system in systems])
+#endregion
 
 
 if __name__ == '__main__':

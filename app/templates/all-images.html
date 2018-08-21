@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 <a href="{{ url_for('newImage') }}"><button class="btn btn-primary">Add an Image</button></a>
-    <h1 class="page_title">All Images</h1>
+    <h1 class="page_title">Images</h1>
     <hr class="dark_hr">
     <div class="row row-top-buffer">
     {% for image in images %}
@@ -13,10 +13,4 @@
         </div>
     {% endfor %}
     </div> 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.matchHeight/0.7.0/jquery.matchHeight-min.js"></script>
-    <script>
-        $(function() {
-            $('.box').matchHeight();
-        });
-    </script>
 {% endblock %}

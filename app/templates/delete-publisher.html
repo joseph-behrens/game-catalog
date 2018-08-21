@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+{% block content %}
+    <h1>Delete Publisher {{publisher.name}}</h1>
+    <h5><strong>ID:</strong> {{publisher.id}}</h5>
+    <h5><strong>Description</strong>: {{publisher.country}}</h5>
+    <h2>Are you sure?</h2>
+    <form method="POST" action="#" autocomplete="off">    
+        <button type="submit" class="btn btn-danger">DELETE</button>
+        <a class="btn btn-primary" href="{{ url_for('allPublishers') }}">Cancel</a>
+    </form>
+{% endblock %}

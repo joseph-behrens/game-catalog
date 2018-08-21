@@ -26,11 +26,13 @@
                   <ul class="dropdown-menu">
                     <li><a href="{{ url_for('login') }}">Log in</a></li>
                     <li role="separator" class="divider"></li>
+                    <li><a href="{{ url_for('default') }}">Home</a></li>
+                    <li role="separator" class="divider"></li>
                     <li><a href="{{ url_for('allGames') }}">Games</a></li>
                     <li><a href="{{ url_for('allImages') }}">Images</a></li>
-                    <li><a href="{{ url_for('newSystem') }}">Systems</a></li>
-                    <li><a href="{{ url_for('newPublisher') }}">Publishers</a></li>
-                    <li><a href="{{ url_for('newManufacturer') }}">Manufacturers</a></li>
+                    <li><a href="{{ url_for('allManufacturers') }}">Manufacturers</a></li>
+                    <li><a href="{{ url_for('allPublishers') }}">Publishers</a></li>
+                    <li><a href="{{ url_for('allSystems') }}">Systems</a></li>
                   </ul>
                 </li>
               </ul>

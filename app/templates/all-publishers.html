@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block content %}
+<a href="{{ url_for('newPublisher') }}"><button class="btn btn-primary">Add a Publisher</button></a>
+    <h1 class="page_title">Publishers</h1>
+    <hr class="dark_hr">
+    <div class="row row-top-buffer">
+    {% for publisher in publishers %}
+        <div class="col-md-2 box">
+            <a href="{{ url_for('editPublisher', publisher_id=publisher[0].id) }}">
+                <img src="{{publisher[1].url}}" alt="{{publisher[1].alt_text}}" width="50px">
+                <h6><strong>ID:</strong> {{publisher[0].id}}</h6>
+                <h6><strong>Name:</strong> {{publisher[0].name}}</h6>
+                <h6><strong>Country:</strong> {{publisher[0].country}}</h6>
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

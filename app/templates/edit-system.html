@@ -2,36 +2,43 @@
 {% block content %}
 <h1 class="page_title">Edit {{system.name}}</h1>
 <hr>
-<form method="POST" action="#" id="new_system" onsubmit="return validateForm()" autocomplete="off">
+<form method="POST" action="#" autocomplete="off">
 <div class="form-group new_system">
         <label for="system_name">System Name</label>
-        <input class="form-control" name="system_name" placeholder="Name of the new system being added">
+        <input class="form-control" name="system_name" value="{{system.name}}" required>
     </div>
     <div class="form-group new_system">
         <label for="manufacturer">Manufacturer</label>
-        <select class="form-control" name="manufacturer">
+        <select class="form-control" name="manufacturer" required>
             <option value="" disabled selected>Select the game system's manufacturer</option>
             {% for manufacturer in manufacturers %}
-                <option value={{manufacturer.id}}>{{manufacturer.name}}</option>
+                {% if manufacturer.id == system.manufacturer_id %}
+                    <option value={{manufacturer.id}} selected>{{manufacturer.name}}</option>
+                {% else %}
+                    <option value={{manufacturer.id}}>{{manufacturer.name}}</option>
+                {% endif %}
             {% endfor %}
         </select>
         <a class="btn btn-primary btn-sm" href="{{ url_for('newManufacturer') }}">New Manufacturer</a>
     </div>
     <div class="form-group new_system">
         <label for="system_description">System Description</label>
-        <input class="form-control" name="system_description" placeholder="Description of the new system being added">
-        <small class="form_error" id="system_description_error"></small>
+        <input class="form-control" name="system_description" value="{{system.description}}" required>
     </div>
     <div class="form-group new_system">
         <label for="system_release_year">System Release Year</label>
-        <input class="form-control" name="system_release_year" placeholder="Year the system was released">
+        <input class="form-control" name="system_release_year" value="{{system.year_released}}">
     </div>
     <div class="form-group new_system" id="system_image_drop_down">
         <label for="image">Game System Logo</label>
-        <select class="form-control" name="system_image">
+        <select class="form-control" name="system_image" required>
             <option value="" disabled selected>Select an image</option>
             {% for image in images %}
-                <option value={{image.id}}>{{image.alt_text}}</option>
+                {% if image.id == system.image_id %}
+                    <option value={{image.id}} selected>{{image.alt_text}}</option>
+                {% else %}
+                    <option value={{image.id}}>{{image.alt_text}}</option>
+                {% endif %}
             {% endfor %}
         </select>
         <a class="btn btn-primary btn-sm" href="{{ url_for('newImage') }}">New Image</a>
@@ -39,5 +46,6 @@
     </fieldset>
     <br>
     <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="{{ url_for('deleteSystem', system_id=system.id) }}" class="btn btn-danger">Delete</a>
 </form>
 {% endblock %}

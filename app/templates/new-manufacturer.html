@@ -2,15 +2,19 @@
 {% block content %}
 <h1 class="page_title">Create a New System Manufacturer</h1>
 <hr>
-<form method="POST" action="#" id="new_manufacturer" onsubmit="return validateForm()" autocomplete="off">
-<div class="form-group new_manufacturer">
+<form method="POST" action="#" autocomplete="off">
+    <div class="form-group new_manufacturer">
         <label for="manufacturer_name">Manufacturer Name</label>
-        <input class="form-control" name="manufacturer_name" placeholder="Name of the new manufacturer being added">
+        <input class="form-control" name="manufacturer_name" placeholder="Name of the new manufacturer being added" required>
+    </div>
+    <div class="form-group new_manufacturer">
+        <label for="manufacturer_name">Year Founded</label>
+        <input class="form-control" name="year_founded" placeholder="Year the company started doing business" required>
     </div>
     <div class="form-group new_manufacturer">
         <label for="manufacturer_country">Manufacturer Country</label>
         <small class="form_error" id="manufacturer_country_error"></small>
-        <select class="form-control" name="manufacturer_country">
+        <select class="form-control" name="manufacturer_country" required>
             <option value="" disabled selected>Select the manufacturer's country</option>
             <option value="AF">Afghanistan</option>
             <option value="AX">Åland Islands</option>
@@ -265,7 +269,7 @@
     </div>
     <div class="form-group new_manufacturer" id="manufacturer_image_drop_down">
         <label for="manufacturer_image">Manufacturer Logo</label>
-        <select class="form-control" name="manufacturer_image">
+        <select class="form-control" name="manufacturer_image" required>
             <option value="" disabled selected>Select an image</option>
             {% for image in images %}
                 <option value={{image.id}}>{{image.alt_text}}</option>
