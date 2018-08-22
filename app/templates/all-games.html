@@ -1,6 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
-<a href="{{ url_for('newGame') }}"><button class="btn btn-primary">Add a Game</button></a>
+{% if 'username' in session %}
+    <a href="{{ url_for('newGame') }}"><button class="btn btn-primary">Add a Game</button></a>
+{% endif %}
     <h1 class="page_title">Games</h1>
     <hr class="dark_hr">
     {% include "game-list.html" %}

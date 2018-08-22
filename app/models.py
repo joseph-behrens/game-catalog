@@ -94,10 +94,9 @@ class User(Base):
 
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    username = Column(String, index=True)
+    name = Column(String, index=True)
     email = Column(String)
-    image_id = Column(Integer, ForeignKey('image.id'))
-    image = relationship(Image)
+    picture = Column(String(250))
 
 
 class Role(Base):

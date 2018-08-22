@@ -7,3 +7,4 @@ Flask-Login
 werkzeug
 passlib
 gunicorn>=19.7.1
+flask_httpauth

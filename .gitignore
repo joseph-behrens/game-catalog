@@ -2,6 +2,7 @@
 *.crt
 *.rsa
 .vscode
+client_secrets.json
 
 
 # Byte-compiled / optimized / DLL files

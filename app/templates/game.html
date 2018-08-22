@@ -1,7 +1,9 @@
 {% extends "main.html" %}
 {% block content %}
-<a href="{{ url_for('editGame', game_id=game[0].id) }}"><button class="btn btn-primary">Edit</button></a>
-<a href="{{ url_for('deleteGame', game_id=game[0].id) }}"><button class="btn btn-primary">Delete</button></a>
+{% if 'username' in session %}
+    <a href="{{ url_for('editGame', game_id=game[0].id) }}"><button class="btn btn-primary">Edit</button></a>
+    <a href="{{ url_for('deleteGame', game_id=game[0].id) }}"><button class="btn btn-primary">Delete</button></a>
+{% endif %}
     <h1 class="page_title">{{game[0].title}}</h1>
     <hr class="dark_hr">
     <div class="row">
