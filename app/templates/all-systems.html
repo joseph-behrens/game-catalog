@@ -1,6 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
-<a href="{{ url_for('newSystem') }}"><button class="btn btn-primary">Add a System</button></a>
+{% if 'username' in session %}
+    <a href="{{ url_for('newSystem') }}"><button class="btn btn-primary">Add a System</button></a>
+{% endif %}
     <h1 class="page_title">Systems</h1>
     <hr class="dark_hr">
     <div class="row row-top-buffer">

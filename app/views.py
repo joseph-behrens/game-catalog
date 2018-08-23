@@ -22,6 +22,7 @@ from models import secret_key
 
 auth = HTTPBasicAuth()
 app = Flask(__name__)
+app.secret_key = secret_key
 
 
 @contextmanager
@@ -67,17 +68,14 @@ def createUser(login_session):
         return user.id
 
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
-
-
-# Create anti-forgery state token
-@app.route('/login')
-def showLogin():
+def createState():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
-    return render_template('login.html', STATE=state)
+    return state
+        
+
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -158,88 +156,9 @@ def gconnect():
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
 
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
     print("done!")
-    return output
+    return "logged in"
 
-
-@app.route('/fbconnect', methods=['POST'])
-def fbconnect():
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    access_token = request.data
-    print( "access token received {0}".format(access_token))
-
-
-    app_id = json.loads(open('fbclientsecrets.json', 'r').read())[
-        'web']['app_id']
-    app_secret = json.loads(
-        open('fbclientsecrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
-
-
-    # Use token to get user info from API
-    userinfo_url = "https://graph.facebook.com/v2.8/me"
-    '''
-        Due to the formatting for the result from the server token exchange we have to
-        split the token first on commas and select the first index which gives us the key : value
-        for the server access token then we split it on colons to pull out the actual token value
-        and replace the remaining quotes with nothing so that it can be used directly in the graph
-        api calls
-    '''
-    token = result.split(',')[0].split(':')[1].replace('"', '')
-
-    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % token
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
-    # print "url sent for API access:%s"% url
-    # print "API JSON result: %s" % result
-    data = json.loads(result)
-    login_session['provider'] = 'facebook'
-    login_session['username'] = data["name"]
-    login_session['email'] = data["email"]
-    login_session['facebook_id'] = data["id"]
-
-    # The token must be stored in the login_session in order to properly logout
-    login_session['access_token'] = token
-
-    # Get user picture
-    url = 'https://graph.facebook.com/v2.8/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
-    data = json.loads(result)
-
-    login_session['picture'] = data["data"]["url"]
-
-    # see if user exists
-    user_id = getUserId(login_session['email'])
-    if not user_id:
-        user_id = createUser(login_session)
-    login_session['user_id'] = user_id
-
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-
-    flash("Now logged in as %s" % login_session['username'])
-    return output
 
 @app.route('/gdisconnect')
 def gdisconnect():
@@ -271,42 +190,26 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-@app.route('/fbdisconnect')
-def fbdisconnect():
-    facebook_id = login_session['facebook_id']
-    url = 'https://graph.facebook.com/{0}/permissions'.format(facebook_id)
-    h = httplib2.Http()
-    result = h.request(url, 'DELETE')[1]
-    del login_session['username']
-    del login_session['email']
-    del login_session['picture']
-    del login_session['user_id']
-    del login_session['facebook_id']
-    return "You have been logged out"
-
 
 @app.route('/disconnect')
 def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
-        if login_session['provider'] == 'facebook':
-            fbdisconnect()
         del login_session['provider']
-        flash("You have successfully been logged out.")
         return redirect(url_for('default'))
     else:
-        flash("You were not logged in")
         return redirect(url_for('default'))
 
 
 @app.route('/')
 def default():
+    state = createState()
     with session_scope() as session:
         top_games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.average_rating.desc()).limit(3)
         games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.created_date.desc()).limit(10)
         systems = session.query(System,Image).filter(System.image_id == Image.id).all()
-        return render_template('default.html', top_games=top_games, games=games, systems=systems)
+        return render_template('default.html', top_games=top_games, games=games, systems=systems, STATE=state)
 
 
 @app.route('/admin')
@@ -317,20 +220,25 @@ def admin():
 #region Game Methods
 @app.route('/game')
 def allGames():
+    state = createState()
     with session_scope() as session:
         games = session.query(Game,Image,System,Company).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).all()
-        return render_template('all-games.html', games=games)
+        return render_template('all-games.html', games=games, STATE=state)
         
 
 @app.route('/game/<int:game_id>')
 def game(game_id):
+    state = createState()
     with session_scope() as session:
-        game = session.query(Game,Image,System,Company).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).filter_by(id=game_id).first()
-        return render_template('game.html', game=game)
+        game = session.query(Game,Image,System,Company,User).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).filter(Game.owner_id == User.id).filter_by(id=game_id).first()
+        return render_template('game.html', game=game, STATE=state)
 
 
 @app.route('/game/new', methods=['GET','POST'])
 def newGame():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
         systems = session.query(System).order_by(System.name).all()
@@ -359,7 +267,7 @@ def newGame():
                    average_rating=game_rating,
                    image_id=game_image.id,
                    system_id=game_system.id,
-                   owner_id=1, # TODO: Change once logins are setup
+                   owner_id=login_session['user_id'],
                    publisher_id=game_publisher.id
                    )
 
@@ -370,6 +278,9 @@ def newGame():
 
 @app.route('/game/<int:game_id>/edit', methods=['GET','POST'])
 def editGame(game_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to edit an item.')
+        return redirect('/')
     with session_scope() as session:
         game = session.query(Game).filter_by(id=game_id).first()
         if request.method == 'GET':
@@ -396,7 +307,7 @@ def editGame(game_id):
 
             game.image_id=game_image.id
             game.system_id=game_system.id
-            game.owner_id=1 # TODO: Change once logins are setup
+            game.editor_id=login_session['user_id']
             game.publisher_id=game_publisher.id
 
             session.add(game)
@@ -406,6 +317,9 @@ def editGame(game_id):
 
 @app.route('/game/<int:game_id>/delete', methods=['GET','POST'])
 def deleteGame(game_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to delete an item.')
+        return redirect('/')
     with session_scope() as session:
         game = session.query(Game).filter_by(id=game_id).first()
         if request.method == 'GET':
@@ -420,6 +334,9 @@ def deleteGame(game_id):
 #region Image Methods
 @app.route('/image/new', methods=['GET','POST'])
 def newImage():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     with session_scope() as session:
         if request.method == 'GET':
             return render_template('new-image.html')
@@ -435,13 +352,17 @@ def newImage():
 
 @app.route('/image')
 def allImages():
+    state = createState()
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
-        return render_template('all-images.html', images=images)
+        return render_template('all-images.html', images=images, STATE=state)
 
 
 @app.route('/image/<int:image_id>/edit', methods=['GET','POST'])
 def editImage(image_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to edit an item.')
+        return redirect('/')
     with session_scope() as session:
         image = session.query(Image).filter_by(id=image_id).first()
         if request.method == 'GET':
@@ -456,6 +377,9 @@ def editImage(image_id):
 
 @app.route('/image/<int:image_id>/delete', methods=['GET','POST'])
 def deleteImage(image_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to delete an item.')
+        return redirect('/')
     with session_scope() as session:
         image = session.query(Image).filter_by(id=image_id).first()
         if request.method == 'GET':
@@ -470,6 +394,9 @@ def deleteImage(image_id):
 #region Publisher Methods
 @app.route('/publisher/new', methods=['GET','POST'])
 def newPublisher():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
         if request.method == 'GET':
@@ -487,13 +414,17 @@ def newPublisher():
 
 @app.route('/publisher')
 def allPublishers():
+    state = createState()
     with session_scope() as session:
         publishers = session.query(Publisher,Image).filter(Publisher.image_id == Image.id).order_by(Publisher.name).all()
-        return render_template('all-publishers.html', publishers=publishers)
+        return render_template('all-publishers.html', publishers=publishers, STATE=state)
 
 
 @app.route('/publisher/<int:publisher_id>/edit', methods=['GET','POST'])
 def editPublisher(publisher_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to edit an item.')
+        return redirect('/')
     with session_scope() as session:
         publisher = session.query(Publisher).filter_by(id=publisher_id).first()
         images = session.query(Image).order_by(Image.alt_text).all()
@@ -510,6 +441,9 @@ def editPublisher(publisher_id):
 
 @app.route('/publisher/<int:publisher_id>/delete', methods=['GET','POST'])
 def deletePublisher(publisher_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to delete an item.')
+        return redirect('/')
     with session_scope() as session:
         publisher = session.query(Publisher).filter_by(id=publisher_id).first()
         if request.method == 'GET':
@@ -532,6 +466,9 @@ def gamesBySystem(system_id):
 
 @app.route('/system/new', methods=['GET','POST'])
 def newSystem():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
         manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
@@ -551,13 +488,17 @@ def newSystem():
 
 @app.route('/system')
 def allSystems():
+    state = createState()
     with session_scope() as session:
         systems = session.query(System,Image).filter(System.image_id == Image.id).order_by(System.name).all()
-        return render_template('all-systems.html', systems=systems)
+        return render_template('all-systems.html', systems=systems, STATE=state)
 
 
 @app.route('/system/<int:system_id>/edit', methods=['GET','POST'])
 def editSystem(system_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to edit an item.')
+        return redirect('/')
     with session_scope() as session:
         system = session.query(System).filter_by(id=system_id).first()
         if request.method == 'GET':
@@ -577,6 +518,9 @@ def editSystem(system_id):
 
 @app.route('/system/<int:system_id>/delete', methods=['GET','POST'])
 def deleteSystem(system_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to delete an item.')
+        return redirect('/')
     with session_scope() as session:
         system = session.query(System).filter_by(id=system_id).first()
         if request.method == 'GET':
@@ -591,6 +535,9 @@ def deleteSystem(system_id):
 #region Manufacturer Methods
 @app.route('/manufacturer/new', methods=['GET','POST'])
 def newManufacturer():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
         if request.method == 'GET':
@@ -609,13 +556,17 @@ def newManufacturer():
 
 @app.route('/manufacturer')
 def allManufacturers():
+    state = createState()
     with session_scope() as session:
         manufacturers = session.query(Manufacturer,Image).filter(Manufacturer.image_id == Image.id).all()
-        return render_template('all-manufacturers.html', manufacturers=manufacturers)
+        return render_template('all-manufacturers.html', manufacturers=manufacturers, STATE=state)
 
 
 @app.route('/manufacturer/<int:manufacturer_id>/edit', methods=['GET','POST'])
 def editManufacturer(manufacturer_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to edit an item.')
+        return redirect('/')
     with session_scope() as session:
         manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
         if request.method == 'GET':
@@ -633,6 +584,9 @@ def editManufacturer(manufacturer_id):
 
 @app.route('/manufacturer/<int:manufacturer_id>/delete', methods=['GET','POST'])
 def deleteManufacturer(manufacturer_id):
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to delete an item.')
+        return redirect('/')
     with session_scope() as session:
         manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
         if request.method == 'GET':
@@ -670,15 +624,6 @@ def publisherList():
             publisher.serialize for publisher in publishers])
 
 
-@app.route('/api/v1/developers')
-def developerList():
-    with session_scope() as session:
-        developers = session.query(Company).filter_by(
-            company_type='Developer').all()
-        return jsonify(developers=[
-            developer.serialize for developer in developers])
-
-
 @app.route('/api/v1/systems')
 def systemList():
     with session_scope() as session:
@@ -688,6 +633,5 @@ def systemList():
 
 
 if __name__ == '__main__':
-    app.secret_key = secret_key
     app.debug = True
     app.run(host='0.0.0.0', port=5000)

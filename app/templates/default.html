@@ -1,5 +1,16 @@
 {% extends "main.html" %}
 {% block content %}
+    <div class="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li><strong>{{ message }}</strong></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
     <h1 class="page_title">Game Catalog</h1>
     <br><br>
     <h2 class="page_title">Top Three Games</h2>

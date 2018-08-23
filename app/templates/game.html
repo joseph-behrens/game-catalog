@@ -34,13 +34,14 @@
             <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="100%">
         </div>
         <div class="col-md-6">
-            <h2>System: {{game[2].name}}</h3>
-            <h3>Publisher: {{game[3].name}}</h3>
-            <h4>Description: {{game[0].description}}</h4>
-            <h4>Article Created: {{game[0].created_date}}</h4>
-            <h4>Creator: {{game[0].owner_id}}</h4>
-            <h4>Edited on: {{game[0].edited_date}}</h4>
-            <h4>Editor: {{game[0].editor_id}}</h4>
+            <h2><strong>System:</strong></h2><p>{{game[2].name}}</p>
+            <h3><strong>Publisher:</strong></h3><p>{{game[3].name}}</p>
+            <h4><strong>Description:</strong></h4><p>{{game[0].description}}</p>
+            <h4><strong>Article Created:</strong></h4><p>{{game[0].created_date}}</p>
+            <h4><strong>Creator:</strong></h4><p><img src="{{game[4].picture}}" class="profile-pic"> {{game[4].name}}</p>
+            {% if game[0].edited_date %}
+                <h4><strong>Edited on:</strong></h4><p>{{game[0].edited_date}}</p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

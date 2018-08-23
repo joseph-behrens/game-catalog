@@ -107,3 +107,19 @@ fieldset {
   vertical-align: text-bottom;
   margin-bottom: 30px;
 }
+
+#signinButton {
+  margin-top: 10px;
+}
+
+.profile-pic {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+}
+
+.flash {
+  color: red;
+}

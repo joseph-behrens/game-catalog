@@ -30,7 +30,7 @@ I've created my own users stories in the GitHub [issues log](https://github.com/
 
 ## Running the Application
 
-The application is hosted at [https://joebehrens.com](https://joebehrens.com) but if you would like to run it on your own you can use the following instructions.
+The application is hosted at [https://games.joebehrens.com](https://games.joebehrens.com) but if you would like to run it on your own you can use the following instructions.
 
 _The below note is not applicable during Udacity review but the keys will be removed and changed after the project is accepted_
 ~~**The keys required to use OAuth are not included in source control. You will need to provide your own keys and setup your reply URLs within your accounts to use login.**~~

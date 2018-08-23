@@ -30,6 +30,12 @@ width: 100%;
 position: fixed;
 background-color: rgb(208, 224, 245);
 border: none;
+z-index: 1;
+}
+
+
+.navbar-brand {
+font-size: 32px;
 }
 
 .btn {
@@ -45,6 +51,10 @@ background-color: rgb(208, 224, 245);
 border-radius: 5px;
 border-color: black;
 width: 100%;
+}
+
+.fa-star {
+color: #a17f1a;
 }
 
 .social-lead {
@@ -71,10 +81,45 @@ align-items: right;
 text-align: center;
 }
 
+
 .dark_hr {
 border: none;
 height: 1px;
 /* Set the hr color */
 color: #333; /* old IE */
 background-color: #333; /* Modern Browsers */
+}
+
+.section {
+margin-top: 120px;
+}
+
+.row-top-buffer { 
+margin-top:20px; 
+}
+
+.table-row {
+display: flex;
+}
+
+.box {
+height: 100px;
+vertical-align: text-bottom;
+margin-bottom: 30px;
+}
+
+#signinButton {
+margin-top: 10px;
+}
+
+.profile-pic {
+width: 30px;
+height: 30px;
+border-radius: 15px;
+-webkit-border-radius: 15px;
+-moz-border-radius: 15px;
+}
+
+.flash {
+color: red;
 }

@@ -133,12 +133,10 @@ class Game(Base):
     image_id = Column(Integer, ForeignKey('image.id'))
     system_id = Column(Integer, ForeignKey('system.id'))
     owner_id = Column(Integer, ForeignKey('user.id'))
-    editor_id = Column(Integer, ForeignKey('user.id'))
     publisher_id = Column(Integer, ForeignKey('publisher.id'))
     image = relationship(Image)
     system = relationship(System)
     owner = relationship(User, foreign_keys=[owner_id])
-    editor = relationship(User, foreign_keys=[editor_id])
     publisher = relationship(Publisher)
 
     @property
@@ -156,8 +154,7 @@ class Game(Base):
             'system_id': self.system_id,
             'owner_id': self.owner_id,
             'editor_id': self.editor_id,
-            'publisher_id': self.publisher_id,
-            'developer_id': self.developer_id
+            'publisher_id': self.publisher_id
         }
 
 
