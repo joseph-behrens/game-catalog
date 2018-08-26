@@ -8,3 +8,7 @@ werkzeug
 passlib
 gunicorn>=19.7.1
 flask_httpauth
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2

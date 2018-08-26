@@ -19,10 +19,21 @@ from flask_httpauth import HTTPBasicAuth
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 from models import secret_key
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import os
+from os import environ
+from oauth2client.contrib.flask_util import UserOAuth2
+from googleapiclient.discovery import build
+
 
 auth = HTTPBasicAuth()
 app = Flask(__name__)
 app.secret_key = secret_key
+app.config.update(dict(
+  PREFERRED_URL_SCHEME = 'https'
+))
+oauth2 = UserOAuth2()
 
 
 @contextmanager
@@ -76,130 +87,115 @@ def createState():
         
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+CLIENT_SECRETS_FILE = "client_secrets.json"
+SCOPES = ['https://www.googleapis.com/auth/plus.me', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+API_SERVICE_NAME = 'drive'
+API_VERSION = 'v2'
+environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
-@app.route('/gconnect', methods=['POST'])
-def gconnect():
-    # Validate state token
-    if request.args.get('state') != login_session['state']:
+@app.route('/authorize')
+def authorize():
+  # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+  flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      CLIENT_SECRETS_FILE, scopes=SCOPES)
+
+  flow.redirect_uri = url_for('oauth2callback', _external=True)
+
+  authorization_url, state = flow.authorization_url(
+      # Enable offline access so that you can refresh an access token without
+      # re-prompting the user for permission. Recommended for web server apps.
+      access_type='offline',
+      # Enable incremental authorization. Recommended as a best practice.
+      include_granted_scopes='true')
+
+  # Store the state so the callback can verify the auth server response.
+  login_session['state'] = state
+
+  return redirect(authorization_url)
+
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    # Specify the state when creating the flow in the callback so that it can
+    # verified in the authorization server response.
+    try:
+        state = login_session['state']
+        if request.args.get('state') != login_session['state']:
+            response = make_response(json.dumps('Invalid state parameter.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    except:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    # Obtain authorization code
-    code = request.data
 
-    try:
-        # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        oauth_flow.redirect_uri = 'postmessage'
-        credentials = oauth_flow.step2_exchange(code)
-    except FlowExchangeError:
-        response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
 
-    # Check that the access token is valid.
-    access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
+    # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+    authorization_response = request.url
+    access_token = flow.fetch_token(authorization_response=authorization_response)
+
+    # Store credentials in the session.
+    # ACTION ITEM: In a production app, you likely want to save these
+    #              credentials in a persistent database instead.
+    credentials = flow.credentials
+    login_session['credentials'] = credentials_to_dict(credentials)
+    login_session['access_token'] = access_token
+    url = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token={0}'.format(access_token['access_token'])
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
-    # If there was an error in the access token info, abort.
-    if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Verify that the access token is used for the intended user.
-    gplus_id = credentials.id_token['sub']
-    if result['user_id'] != gplus_id:
-        response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Verify that the access token is valid for this app.
-    if result['issued_to'] != CLIENT_ID:
-        response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
-        print("Token's client ID does not match app's.")
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    stored_access_token = login_session.get('access_token')
-    stored_gplus_id = login_session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Store the access token in the session for later use.
-    login_session['access_token'] = credentials.access_token
-    login_session['gplus_id'] = gplus_id
-
-    # Get user info
-    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {'access_token': credentials.access_token, 'alt': 'json'}
-    answer = requests.get(userinfo_url, params=params)
-
-    data = answer.json()
-
-    login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
-    login_session['email'] = data['email']
+    login_session['email'] = result['email']
+    login_session['username'] = result['name']
+    login_session['picture'] = result['picture']
     login_session['provider'] = 'google'
 
     user_id = getUserId(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
-
-    print("done!")
-    return "logged in"
-
-
-@app.route('/gdisconnect')
-def gdisconnect():
-    access_token = login_session.get('access_token')
-    if access_token is None:
-        print('Access Token is None')
-        response = make_response(json.dumps('Current user not connected.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    print('In gdisconnect access token is %s', access_token)
-    print('User name is: ')
-    print(login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
-    h = httplib2.Http()
-    result = h.request(url, 'GET')[0]
-    print( 'result is ')
-    print( result)
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    return redirect(request.referrer or '/')
 
 
 @app.route('/disconnect')
 def disconnect():
-    if 'provider' in login_session:
-        if login_session['provider'] == 'google':
-            gdisconnect()
+  if 'username' not in login_session:
+    flash('You need to <a href="/authorize">authorize</a> before ' +
+            'testing the code to revoke credentials.')
+    return redirect(url_for('default'))
+
+  credentials = google.oauth2.credentials.Credentials(
+    **login_session['credentials'])
+
+  revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
+      params={'token': credentials.token},
+      headers = {'content-type': 'application/x-www-form-urlencoded'})
+
+  status_code = getattr(revoke, 'status_code')
+  if status_code == 200:
+    if 'credentials' in login_session:
+        del login_session['credentials']
+        del login_session['access_token']
+        del login_session['email']
+        del login_session['username']
+        del login_session['picture']
         del login_session['provider']
-        return redirect(url_for('default'))
-    else:
-        return redirect(url_for('default'))
+    login_session.modified = True
+    return redirect(request.referrer or '/')
+  else:
+    flash('An error occurred revoking credentials')
+    return redirect(url_for('default'))
+
+
+def credentials_to_dict(credentials):
+  return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes}
 
 
 @app.route('/')
@@ -629,9 +625,17 @@ def systemList():
     with session_scope() as session:
         systems = session.query(System).all()
         return jsonify(systems=[system.serialize for system in systems])
+
+
+@app.route('/api/v1/images')
+def systemList():
+    with session_scope() as session:
+        images = session.query(Image).all()
+        return jsonify(images=[image.serialize for image in images])
 #endregion
 
 
 if __name__ == '__main__':
     app.debug = True
+    app.secret_key = secret_key
     app.run(host='0.0.0.0', port=5000)

@@ -34,41 +34,7 @@
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu<span class="caret"></span></a>
                   <ul class="dropdown-menu">
                     {% if 'username' not in session %}
-                    <div id="signinButton" align="center">
-                        <span class="g-signin"
-                          data-scope="openid email"
-                          data-clientid="X"
-                          data-redirecturi="postmessage"
-                          data-accesstype="offline"
-                          data-cookiepolicy="single_host_origin"
-                          data-callback="signInCallback"
-                          data-approvalprompt="force">
-                        </span>
-                      </div>
-                      <script>
-                        function signInCallback(authResult) {
-                          if (authResult['code']) {
-                          // Hide the sign-in button now that the user is authorized
-                          $('#signinButton').attr('style', 'display: none');
-                          // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
-                          $.ajax({
-                          type: 'POST',
-                          url: '/gconnect?state={{STATE}}',
-                          processData: false,
-                          data: authResult['code'],
-                          contentType: 'application/octet-stream; charset=utf-8',
-                          success: function(result) {
-                            // Handle or verify the server response if necessary.
-                            if (result) {
-                              window.location.reload();
-                          } else if (authResult['error']) {
-                          console.log('There was an error: ' + authResult['error']);
-                          } else {
-                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-                            }
-                          }
-                          }); } }
-                      </script>
+                      <li><a href="{{ url_for('authorize') }}"><img src="{{ url_for('static', filename='images/google-signin.png') }}" alt="Login"></a></li>
                     {% else %}
                       <li><a class="btn btn-primary" href="{{ url_for('disconnect') }}">Sign Out</a></li>
                     {% endif %}

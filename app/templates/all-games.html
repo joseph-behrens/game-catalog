@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
-{% if 'username' in session %}
+{% if 'credentials' in session %}
     <a href="{{ url_for('newGame') }}"><button class="btn btn-primary">Add a Game</button></a>
 {% endif %}
     <h1 class="page_title">Games</h1>
