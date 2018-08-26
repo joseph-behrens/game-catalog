@@ -1,31 +1,32 @@
 <div class="row">
-        {% for game in games %}
-            <div class="col-md-3 row-top-buffer box" align="center">
-                <a href="{{ url_for('game', game_id=game[0].id) }}"><h6>{{game[0].title}}</h6></a>
-                <p>
-                    {% if game[0].average_rating == 1 %}
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 2 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 3 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 4 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% elif game[0].average_rating == 5 %}
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                    {% endif %}
-                </p>
-                <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="50" >
-            </div>
-        {% endfor %}
+    {% for game in games %}
+    <div class="col-md-3 row-top-buffer box" align="center">
+        <p>
+            {% if game[0].average_rating == 1 %}
+                <i class="fa fa-star"></i>
+            {% elif game[0].average_rating == 2 %}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            {% elif game[0].average_rating == 3 %}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            {% elif game[0].average_rating == 4 %}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            {% elif game[0].average_rating == 5 %}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            {% endif %}
+        </p>
+        <a href="{{ url_for('game', game_id=game[0].id) }}">
+            <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="50">
+            <h6>{{game[0].title}}</h6></a>
     </div>
+    {% endfor %}
+</div>

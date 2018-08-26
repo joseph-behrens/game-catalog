@@ -30,9 +30,7 @@ from googleapiclient.discovery import build
 auth = HTTPBasicAuth()
 app = Flask(__name__)
 app.secret_key = secret_key
-app.config.update(dict(
-  PREFERRED_URL_SCHEME = 'https'
-))
+app.config.update(dict(PREFERRED_URL_SCHEME='https'))
 oauth2 = UserOAuth2()
 
 
@@ -58,12 +56,13 @@ def getUserId(email):
         try:
             user = session.query(User).filter_by(email=email).one()
             return user.id
-        except:
+        except:  # noqa: E722
             return None
+
 
 def getUserInfo(user_id):
     with session_scope() as session:
-        user = session.query(User).filter_by(id = user_id).one()
+        user = session.query(User).filter_by(id=user_id).one()
         return user
 
 
@@ -75,20 +74,26 @@ def createUser(login_session):
             picture=login_session['picture'])
         session.add(newUser)
         session.commit()
-        user = session.query(User).filter_by(email=login_session['email']).one()
+        user = session.query(User).filter_by(
+            email=login_session['email']).one()
         return user.id
 
 
 def createState():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+    state = ''.join(random.choice(
+                    string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
     return state
-        
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+
+CLIENT_ID = json.loads(open(
+                'client_secrets.json', 'r').read())['web']['client_id']
 CLIENT_SECRETS_FILE = "client_secrets.json"
-SCOPES = ['https://www.googleapis.com/auth/plus.me', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+SCOPES = [
+    'https://www.googleapis.com/auth/plus.me',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile']
 API_SERVICE_NAME = 'drive'
 API_VERSION = 'v2'
 environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -96,23 +101,25 @@ environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 @app.route('/authorize')
 def authorize():
-  # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-  flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-      CLIENT_SECRETS_FILE, scopes=SCOPES)
+    # Create flow instance to manage the
+    # OAuth 2.0 Authorization Grant Flow steps.
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE, scopes=SCOPES)
 
-  flow.redirect_uri = url_for('oauth2callback', _external=True)
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
 
-  authorization_url, state = flow.authorization_url(
-      # Enable offline access so that you can refresh an access token without
-      # re-prompting the user for permission. Recommended for web server apps.
-      access_type='offline',
-      # Enable incremental authorization. Recommended as a best practice.
-      include_granted_scopes='true')
+    authorization_url, state = flow.authorization_url(
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission.
+        # Recommended for web server apps.
+        access_type='offline',
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes='true')
 
-  # Store the state so the callback can verify the auth server response.
-  login_session['state'] = state
+    # Store the state so the callback can verify the auth server response.
+    login_session['state'] = state
 
-  return redirect(authorization_url)
+    return redirect(authorization_url)
 
 
 @app.route('/oauth2callback')
@@ -122,10 +129,11 @@ def oauth2callback():
     try:
         state = login_session['state']
         if request.args.get('state') != login_session['state']:
-            response = make_response(json.dumps('Invalid state parameter.'), 401)
+            response = make_response(
+                json.dumps('Invalid state parameter.'), 401)
             response.headers['Content-Type'] = 'application/json'
             return response
-    except:
+    except:  # noqa: E722
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -136,7 +144,8 @@ def oauth2callback():
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = request.url
-    access_token = flow.fetch_token(authorization_response=authorization_response)
+    access_token = flow.fetch_token(
+        authorization_response=authorization_response)
 
     # Store credentials in the session.
     # ACTION ITEM: In a production app, you likely want to save these
@@ -144,7 +153,7 @@ def oauth2callback():
     credentials = flow.credentials
     login_session['credentials'] = credentials_to_dict(credentials)
     login_session['access_token'] = access_token
-    url = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token={0}'.format(access_token['access_token'])
+    url = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token={0}'.format(access_token['access_token'])  # noqa: E501
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     login_session['email'] = result['email']
@@ -161,76 +170,95 @@ def oauth2callback():
 
 @app.route('/disconnect')
 def disconnect():
-  if 'username' not in login_session:
-    flash('You need to <a href="/authorize">authorize</a> before ' +
-            'testing the code to revoke credentials.')
-    return redirect(url_for('default'))
+    if 'username' not in login_session:
+        flash('No login session available to sign out.')
+        return redirect(url_for('default'))
 
-  credentials = google.oauth2.credentials.Credentials(
-    **login_session['credentials'])
+    credentials = google.oauth2.credentials.Credentials(
+                    **login_session['credentials'])
 
-  revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
-      params={'token': credentials.token},
-      headers = {'content-type': 'application/x-www-form-urlencoded'})
+    revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
+                           params={'token': credentials.token},
+                           headers={'content-type': 'application/x-www-form-urlencoded'})  # noqa: E501
 
-  status_code = getattr(revoke, 'status_code')
-  if status_code == 200:
-    if 'credentials' in login_session:
-        del login_session['credentials']
-        del login_session['access_token']
-        del login_session['email']
-        del login_session['username']
-        del login_session['picture']
-        del login_session['provider']
-    login_session.modified = True
-    return redirect(request.referrer or '/')
-  else:
-    flash('An error occurred revoking credentials')
-    return redirect(url_for('default'))
+    status_code = getattr(revoke, 'status_code')
+    if status_code == 200:
+        if 'credentials' in login_session:
+            del login_session['credentials']
+            del login_session['access_token']
+            del login_session['email']
+            del login_session['username']
+            del login_session['picture']
+            del login_session['provider']
+        login_session.modified = True
+        return redirect(url_for('default'))
+    else:
+        flash('An error occurred revoking credentials')
+        return redirect(url_for('default'))
 
 
 def credentials_to_dict(credentials):
-  return {'token': credentials.token,
-          'refresh_token': credentials.refresh_token,
-          'token_uri': credentials.token_uri,
-          'client_id': credentials.client_id,
-          'client_secret': credentials.client_secret,
-          'scopes': credentials.scopes}
+    return {'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': credentials.scopes}
 
 
 @app.route('/')
 def default():
     state = createState()
     with session_scope() as session:
-        top_games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.average_rating.desc()).limit(3)
-        games = session.query(Game,Image).filter(Game.image_id == Image.id).order_by(Game.created_date.desc()).limit(10)
-        systems = session.query(System,Image).filter(System.image_id == Image.id).all()
-        return render_template('default.html', top_games=top_games, games=games, systems=systems, STATE=state)
+        top_games = session.query(Game, Image).filter(
+            Game.image_id == Image.id).order_by(
+                Game.average_rating.desc()).limit(3)
+        games = session.query(Game, Image).filter(
+            Game.image_id == Image.id).order_by(
+                Game.created_date.desc()).limit(10)
+        systems = session.query(System, Image).filter(
+            System.image_id == Image.id).all()
+        return render_template('default.html',
+                               top_games=top_games,
+                               games=games,
+                               systems=systems,
+                               STATE=state)
 
 
 @app.route('/admin')
 def admin():
+    if 'username' not in login_session:
+        flash('Access Denied. You must be logged in to create an item.')
+        return redirect('/')
     return render_template('admin.html')
 
 
-#region Game Methods
+# region Game Methods
 @app.route('/game')
 def allGames():
     state = createState()
     with session_scope() as session:
-        games = session.query(Game,Image,System,Company).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).all()
+        games = session.query(Game, Image, System, Company).filter(
+            Game.image_id == Image.id).filter(
+                Game.system_id == System.id).filter(
+                    Game.publisher_id == Company.id).all()
         return render_template('all-games.html', games=games, STATE=state)
-        
+
 
 @app.route('/game/<int:game_id>')
 def game(game_id):
     state = createState()
     with session_scope() as session:
-        game = session.query(Game,Image,System,Company,User).filter(Game.image_id == Image.id).filter(Game.system_id == System.id).filter(Game.publisher_id == Company.id).filter(Game.owner_id == User.id).filter_by(id=game_id).first()
+        game = session.query(Game, Image, System, Company, User).filter(
+            Game.image_id == Image.id).filter(
+                Game.system_id == System.id).filter(
+                    Game.publisher_id == Company.id).filter(
+                        Game.owner_id == User.id).filter_by(
+                            id=game_id).first()
         return render_template('game.html', game=game, STATE=state)
 
 
-@app.route('/game/new', methods=['GET','POST'])
+@app.route('/game/new', methods=['GET', 'POST'])
 def newGame():
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to create an item.')
@@ -238,23 +266,28 @@ def newGame():
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
         systems = session.query(System).order_by(System.name).all()
-        manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
-        publishers = session.query(Publisher).order_by(Publisher.name).all()
+        manufacturers = session.query(Manufacturer).order_by(
+            Manufacturer.name).all()
+        publishers = session.query(Publisher).order_by(
+            Publisher.name).all()
         print(images[0].url)
         if request.method == 'GET':
             return render_template('new-game.html',
-                                    images=images,
-                                    systems=systems,
-                                    manufacturers=manufacturers,
-                                    publishers=publishers)
+                                   images=images,
+                                   systems=systems,
+                                   manufacturers=manufacturers,
+                                   publishers=publishers)
         if request.method == 'POST':
-            game_title =  request.form["title"]
-            game_description =  request.form["description"]
+            game_title = request.form["title"]
+            game_description = request.form["description"]
             game_release_year = request.form["year_released"]
             game_rating = request.form["initial_rating"]
-            game_image = session.query(Image).filter_by(id=request.form["image"]).first()
-            game_publisher = session.query(Company).filter_by(id=request.form["publisher"]).first()
-            game_system = session.query(System).filter_by(id=request.form["system"]).first()
+            game_image = session.query(Image).filter_by(
+                id=request.form["image"]).first()
+            game_publisher = session.query(Company).filter_by(
+                id=request.form["publisher"]).first()
+            game_system = session.query(System).filter_by(
+                id=request.form["system"]).first()
 
             game = Game(
                    title=game_title,
@@ -272,7 +305,7 @@ def newGame():
             return redirect(url_for('default'))
 
 
-@app.route('/game/<int:game_id>/edit', methods=['GET','POST'])
+@app.route('/game/<int:game_id>/edit', methods=['GET', 'POST'])
 def editGame(game_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to edit an item.')
@@ -282,36 +315,41 @@ def editGame(game_id):
         if request.method == 'GET':
             images = session.query(Image).order_by(Image.alt_text).all()
             systems = session.query(System).order_by(System.name).all()
-            manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
-            publishers = session.query(Publisher).order_by(Publisher.name).all()
+            manufacturers = session.query(Manufacturer).order_by(
+                Manufacturer.name).all()
+            publishers = session.query(Publisher).order_by(
+                Publisher.name).all()
             return render_template('edit-game.html',
-                                    game=game,
-                                    images=images,
-                                    systems=systems,
-                                    manufacturers=manufacturers,
-                                    publishers=publishers)
-                                    
+                                   game=game,
+                                   images=images,
+                                   systems=systems,
+                                   manufacturers=manufacturers,
+                                   publishers=publishers)
+
         if request.method == 'POST':
-            game.title =  request.form["title"]
-            game.description =  request.form["description"]
+            game.title = request.form["title"]
+            game.description = request.form["description"]
             game.year_released = request.form["year_released"]
             game.average_rating = request.form["initial_rating"]
 
-            game_image = session.query(Image).filter_by(id=request.form["image"]).first()
-            game_publisher = session.query(Company).filter_by(id=request.form["publisher"]).first()
-            game_system = session.query(System).filter_by(id=request.form["system"]).first()
+            game_image = session.query(Image).filter_by(
+                id=request.form["image"]).first()
+            game_publisher = session.query(Company).filter_by(
+                id=request.form["publisher"]).first()
+            game_system = session.query(System).filter_by(
+                id=request.form["system"]).first()
 
-            game.image_id=game_image.id
-            game.system_id=game_system.id
-            game.editor_id=login_session['user_id']
-            game.publisher_id=game_publisher.id
+            game.image_id = game_image.id
+            game.system_id = game_system.id
+            game.editor_id = login_session['user_id']
+            game.publisher_id = game_publisher.id
 
             session.add(game)
             session.commit()
             return redirect(url_for('game', game_id=game.id))
 
 
-@app.route('/game/<int:game_id>/delete', methods=['GET','POST'])
+@app.route('/game/<int:game_id>/delete', methods=['GET', 'POST'])
 def deleteGame(game_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to delete an item.')
@@ -324,11 +362,11 @@ def deleteGame(game_id):
             session.delete(game)
             session.commit()
             return redirect(url_for('default'))
-#endregion
+# endregion
 
 
-#region Image Methods
-@app.route('/image/new', methods=['GET','POST'])
+# region Image Methods
+@app.route('/image/new', methods=['GET', 'POST'])
 def newImage():
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to create an item.')
@@ -354,7 +392,7 @@ def allImages():
         return render_template('all-images.html', images=images, STATE=state)
 
 
-@app.route('/image/<int:image_id>/edit', methods=['GET','POST'])
+@app.route('/image/<int:image_id>/edit', methods=['GET', 'POST'])
 def editImage(image_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to edit an item.')
@@ -371,7 +409,7 @@ def editImage(image_id):
             return redirect(url_for('allImages'))
 
 
-@app.route('/image/<int:image_id>/delete', methods=['GET','POST'])
+@app.route('/image/<int:image_id>/delete', methods=['GET', 'POST'])
 def deleteImage(image_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to delete an item.')
@@ -384,11 +422,11 @@ def deleteImage(image_id):
             session.delete(image)
             session.commit()
             return redirect(url_for('allImages'))
-#endregion
+# endregion
 
 
-#region Publisher Methods
-@app.route('/publisher/new', methods=['GET','POST'])
+# region Publisher Methods
+@app.route('/publisher/new', methods=['GET', 'POST'])
 def newPublisher():
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to create an item.')
@@ -412,11 +450,14 @@ def newPublisher():
 def allPublishers():
     state = createState()
     with session_scope() as session:
-        publishers = session.query(Publisher,Image).filter(Publisher.image_id == Image.id).order_by(Publisher.name).all()
-        return render_template('all-publishers.html', publishers=publishers, STATE=state)
+        publishers = session.query(Publisher, Image).filter(
+            Publisher.image_id == Image.id).order_by(Publisher.name).all()
+        return render_template('all-publishers.html',
+                               publishers=publishers,
+                               STATE=state)
 
 
-@app.route('/publisher/<int:publisher_id>/edit', methods=['GET','POST'])
+@app.route('/publisher/<int:publisher_id>/edit', methods=['GET', 'POST'])
 def editPublisher(publisher_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to edit an item.')
@@ -425,7 +466,9 @@ def editPublisher(publisher_id):
         publisher = session.query(Publisher).filter_by(id=publisher_id).first()
         images = session.query(Image).order_by(Image.alt_text).all()
         if request.method == 'GET':
-            return render_template('edit-publisher.html', publisher=publisher, images=images)
+            return render_template('edit-publisher.html',
+                                   publisher=publisher,
+                                   images=images)
         if request.method == 'POST':
             publisher.name = request.form['publisher_name']
             publisher.country = request.form['publisher_country']
@@ -435,7 +478,7 @@ def editPublisher(publisher_id):
             return redirect(url_for('allPublishers'))
 
 
-@app.route('/publisher/<int:publisher_id>/delete', methods=['GET','POST'])
+@app.route('/publisher/<int:publisher_id>/delete', methods=['GET', 'POST'])
 def deletePublisher(publisher_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to delete an item.')
@@ -443,33 +486,41 @@ def deletePublisher(publisher_id):
     with session_scope() as session:
         publisher = session.query(Publisher).filter_by(id=publisher_id).first()
         if request.method == 'GET':
-            return render_template('delete-publisher.html', publisher=publisher)
+            return render_template('delete-publisher.html',
+                                   publisher=publisher)
         if request.method == 'POST':
             session.delete(publisher)
             session.commit()
             return redirect(url_for('allPublishers'))
-#endregion
+# endregion
 
 
-#region System Methods
+# region System Methods
 @app.route('/system/<int:system_id>')
 def gamesBySystem(system_id):
     with session_scope() as session:
-        system = session.query(System,Image).filter(System.image_id == Image.id).filter_by(id=system_id).first()
-        games = session.query(Game,Image).filter(Game.image_id == Image.id).filter(Game.system_id == system_id).all()
+        system = session.query(System, Image).filter(
+            System.image_id == Image.id).filter_by(
+                id=system_id).first()
+        games = session.query(Game, Image).filter(
+            Game.image_id == Image.id).filter(
+                Game.system_id == system_id).all()
         return render_template('system.html', system=system, games=games)
 
 
-@app.route('/system/new', methods=['GET','POST'])
+@app.route('/system/new', methods=['GET', 'POST'])
 def newSystem():
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to create an item.')
         return redirect('/')
     with session_scope() as session:
         images = session.query(Image).order_by(Image.alt_text).all()
-        manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
+        manufacturers = session.query(Manufacturer).order_by(
+            Manufacturer.name).all()
         if request.method == 'GET':
-            return render_template('new-system.html', images=images, manufacturers=manufacturers)
+            return render_template('new-system.html',
+                                   images=images,
+                                   manufacturers=manufacturers)
         if request.method == 'POST':
             system = System(
                         name=request.form["system_name"],
@@ -486,11 +537,15 @@ def newSystem():
 def allSystems():
     state = createState()
     with session_scope() as session:
-        systems = session.query(System,Image).filter(System.image_id == Image.id).order_by(System.name).all()
-        return render_template('all-systems.html', systems=systems, STATE=state)
+        systems = session.query(System, Image).filter(
+            System.image_id == Image.id).order_by(
+                System.name).all()
+        return render_template('all-systems.html',
+                               systems=systems,
+                               STATE=state)
 
 
-@app.route('/system/<int:system_id>/edit', methods=['GET','POST'])
+@app.route('/system/<int:system_id>/edit', methods=['GET', 'POST'])
 def editSystem(system_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to edit an item.')
@@ -498,9 +553,13 @@ def editSystem(system_id):
     with session_scope() as session:
         system = session.query(System).filter_by(id=system_id).first()
         if request.method == 'GET':
-            manufacturers = session.query(Manufacturer).order_by(Manufacturer.name).all()
+            manufacturers = session.query(Manufacturer).order_by(
+                Manufacturer.name).all()
             images = session.query(Image).order_by(Image.alt_text).all()
-            return render_template('edit-system.html', system=system, manufacturers=manufacturers, images=images)
+            return render_template('edit-system.html',
+                                   system=system,
+                                   manufacturers=manufacturers,
+                                   images=images)
         if request.method == 'POST':
             system.name = request.form['system_name']
             system.manufacturer_id = request.form['manufacturer']
@@ -512,7 +571,7 @@ def editSystem(system_id):
             return redirect(url_for('allSystems'))
 
 
-@app.route('/system/<int:system_id>/delete', methods=['GET','POST'])
+@app.route('/system/<int:system_id>/delete', methods=['GET', 'POST'])
 def deleteSystem(system_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to delete an item.')
@@ -525,11 +584,11 @@ def deleteSystem(system_id):
             session.delete(system)
             session.commit()
             return redirect(url_for('allSystems'))
-#endregion
+# endregion
 
 
-#region Manufacturer Methods
-@app.route('/manufacturer/new', methods=['GET','POST'])
+# region Manufacturer Methods
+@app.route('/manufacturer/new', methods=['GET', 'POST'])
 def newManufacturer():
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to create an item.')
@@ -554,20 +613,26 @@ def newManufacturer():
 def allManufacturers():
     state = createState()
     with session_scope() as session:
-        manufacturers = session.query(Manufacturer,Image).filter(Manufacturer.image_id == Image.id).all()
-        return render_template('all-manufacturers.html', manufacturers=manufacturers, STATE=state)
+        manufacturers = session.query(Manufacturer, Image).filter(
+            Manufacturer.image_id == Image.id).all()
+        return render_template('all-manufacturers.html',
+                               manufacturers=manufacturers,
+                               STATE=state)
 
 
-@app.route('/manufacturer/<int:manufacturer_id>/edit', methods=['GET','POST'])
+@app.route('/manufacturer/<int:manufacturer_id>/edit', methods=['GET', 'POST'])
 def editManufacturer(manufacturer_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to edit an item.')
         return redirect('/')
     with session_scope() as session:
-        manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
+        manufacturer = session.query(Manufacturer).filter_by(
+            id=manufacturer_id).first()
         if request.method == 'GET':
             images = session.query(Image).order_by(Image.alt_text).all()
-            return render_template('edit-manufacturer.html', manufacturer=manufacturer, images=images)
+            return render_template('edit-manufacturer.html',
+                                   manufacturer=manufacturer,
+                                   images=images)
         if request.method == 'POST':
             manufacturer.name = request.form['manufacturer_name']
             manufacturer.country = request.form['manufacturer_country']
@@ -578,23 +643,31 @@ def editManufacturer(manufacturer_id):
             return redirect(url_for('allManufacturers'))
 
 
-@app.route('/manufacturer/<int:manufacturer_id>/delete', methods=['GET','POST'])
+@app.route('/manufacturer/<int:manufacturer_id>/delete',
+           methods=['GET', 'POST'])
 def deleteManufacturer(manufacturer_id):
     if 'username' not in login_session:
         flash('Access Denied. You must be logged in to delete an item.')
         return redirect('/')
     with session_scope() as session:
-        manufacturer = session.query(Manufacturer).filter_by(id=manufacturer_id).first()
+        manufacturer = session.query(Manufacturer).filter_by(
+            id=manufacturer_id).first()
         if request.method == 'GET':
-            return render_template('delete-manufacturer.html', manufacturer=manufacturer)
+            return render_template('delete-manufacturer.html',
+                                   manufacturer=manufacturer)
         if request.method == 'POST':
             session.delete(manufacturer)
             session.commit()
             return redirect(url_for('allManufacturers'))
-#endregion
+# endregion
 
 
-#region API Calls
+# region API Calls
+@app.route('/api-info')
+def apiInfo():
+    return render_template('api-info.html')
+
+
 @app.route('/api/v1/games')
 def gamesList():
     with session_scope() as session:
@@ -602,11 +675,19 @@ def gamesList():
         return jsonify(games=[game.serialize for game in games])
 
 
+@app.route('/api/v1/companies')
+def companyList():
+    with session_scope() as session:
+        companies = session.query(Company).all()
+        return jsonify(companies=[
+                company.serialize for company in companies])
+
+
 @app.route('/api/v1/manufacturers')
 def manufacturerList():
     with session_scope() as session:
         manufacturers = session.query(Company).filter_by(
-            company_type='Manufacturer').all()
+            company_type='manufacturer').all()
         return jsonify(manufacturers=[
                 manufacturer.serialize for manufacturer in manufacturers])
 
@@ -615,7 +696,7 @@ def manufacturerList():
 def publisherList():
     with session_scope() as session:
         publishers = session.query(Company).filter_by(
-            company_type='Publisher').all()
+            company_type='publisher').all()
         return jsonify(publishers=[
             publisher.serialize for publisher in publishers])
 
@@ -628,14 +709,13 @@ def systemList():
 
 
 @app.route('/api/v1/images')
-def systemList():
+def imageList():
     with session_scope() as session:
         images = session.query(Image).all()
         return jsonify(images=[image.serialize for image in images])
-#endregion
+# endregion
 
 
 if __name__ == '__main__':
     app.debug = True
-    app.secret_key = secret_key
     app.run(host='0.0.0.0', port=5000)

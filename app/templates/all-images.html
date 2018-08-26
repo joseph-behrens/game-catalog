@@ -7,7 +7,7 @@
     <hr class="dark_hr">
     <div class="row row-top-buffer">
     {% for image in images %}
-        <div class="col-md-2 box">
+        <div class="col-md-2 box" align="center">
             <a href="{{ url_for('editImage', image_id=image.id) }}">
                 <img src="{{image.url}}" alt="{{image.alt_text}}" width="50px">
                 <h6>{{image.alt_text}}</h6>

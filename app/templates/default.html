@@ -53,10 +53,9 @@
     <hr class="dark_hr">
     <div class="row">
         {% for system in systems %}
-            <div class="col-md-3 row-top-buffer" align="center">
+            <div class="col-md-4 row-top-buffer" align="center">
                 <a href="{{ url_for('gamesBySystem', system_id=system[0].id) }}">
-                <img src="{{system[1].url}}" alt="{{system[1].alt_text}}" height="50px" max-width="75%">
-                <h6>{{system[0].name}}</h6></a>
+                <img src="{{system[1].url}}" alt="{{system[1].alt_text}}" height="50px" max-width="75%"></a>
             </div>
         {% endfor %}
     </div>

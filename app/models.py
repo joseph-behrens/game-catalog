@@ -23,6 +23,15 @@ class Image(Base):
     url = Column(String)
     alt_text = Column(String)
 
+    @property
+    def serialize(self):
+        """Use to return JSON formatted output."""
+        return {
+            'id': self.id,
+            'url': self.url,
+            'alt_text': self.alt_text
+        }
+
 
 class Rating(Base):
     """Game ratings from 1 to 5."""
@@ -45,6 +54,17 @@ class Company(Base):
     image = relationship(Image)
     company_type = Column(String(32), nullable=False)
     __mapper_args__ = {'polymorphic_on': company_type}
+
+    @property
+    def serialize(self):
+        """Use to return JSON formatted output."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'country': self.country,
+            'company_type': self.company_type,
+            'image_id': self.image_id
+        }
 
 
 class Manufacturer(Company):
@@ -87,6 +107,18 @@ class System(Base):
     image_id = Column(Integer, ForeignKey('image.id'))
     image = relationship(Image)
     manufacturer = relationship(Manufacturer)
+
+    @property
+    def serialize(self):
+        """Use to return JSON formatted output."""
+        return {
+            'id': self.id,
+            'manufacturer_id': self.manufacturer_id,
+            'name': self.name,
+            'description': self.description,
+            'year_released': self.year_released,
+            'image_id': self.image_id
+        }
 
 
 class User(Base):
@@ -153,7 +185,6 @@ class Game(Base):
             'image_id': self.image_id,
             'system_id': self.system_id,
             'owner_id': self.owner_id,
-            'editor_id': self.editor_id,
             'publisher_id': self.publisher_id
         }
 

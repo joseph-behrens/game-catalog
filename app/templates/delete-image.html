@@ -1,12 +1,12 @@
 {% extends "main.html" %}
 {% block content %}
-    <h1>Delete {{image.alt_text}}</h1>
-    <h5>ID: {{image.id}}</h5>
-    <h5>URL: {{image.url}}</h5>
-    <h2>Are you sure?</h2>
-    <img src="{{ image.url }}" alt="{{ image.alt_text }}"><br><br>
-    <form method="POST" action="#">    
-        <button type="submit" class="btn btn-danger">DELETE</button>
-        <a class="btn btn-primary" href="{{ url_for('allImages') }}">Cancel</a>
-    </form>
+<h1>Delete {{image.alt_text}}</h1>
+<h5>ID: {{image.id}}</h5>
+<h5>URL: {{image.url}}</h5>
+<h2>Are you sure?</h2>
+<img src="{{ image.url }}" alt="{{ image.alt_text }}"><br><br>
+<form method="POST" action="#">
+    <button type="submit" class="btn btn-danger">DELETE</button>
+    <a class="btn btn-primary" href="{{ url_for('allImages') }}">Cancel</a>
+</form>
 {% endblock %}

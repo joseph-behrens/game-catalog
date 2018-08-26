@@ -4,44 +4,50 @@
     <a href="{{ url_for('editGame', game_id=game[0].id) }}"><button class="btn btn-primary">Edit</button></a>
     <a href="{{ url_for('deleteGame', game_id=game[0].id) }}"><button class="btn btn-primary">Delete</button></a>
 {% endif %}
-    <h1 class="page_title">{{game[0].title}}</h1>
-    <hr class="dark_hr">
-    <div class="row">
-        <div class="col-md-6">
-            <p>
-                    {% if game[0].average_rating == 1 %}
-                        <i class="fa fa-star fa-4x"></i>
-                    {% elif game[0].average_rating == 2 %}
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                    {% elif game[0].average_rating == 3 %}
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                    {% elif game[0].average_rating == 4 %}
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                    {% elif game[0].average_rating == 5 %}
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                        <i class="fa fa-star fa-4x"></i>
-                    {% endif %}
-                </p>
-            <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="100%">
-        </div>
-        <div class="col-md-6">
-            <h2><strong>System:</strong></h2><p>{{game[2].name}}</p>
-            <h3><strong>Publisher:</strong></h3><p>{{game[3].name}}</p>
-            <h4><strong>Description:</strong></h4><p>{{game[0].description}}</p>
-            <h4><strong>Article Created:</strong></h4><p>{{game[0].created_date}}</p>
-            <h4><strong>Creator:</strong></h4><p><img src="{{game[4].picture}}" class="profile-pic"> {{game[4].name}}</p>
-            {% if game[0].edited_date %}
-                <h4><strong>Edited on:</strong></h4><p>{{game[0].edited_date}}</p>
+<h1 class="page_title">{{game[0].title}}</h1>
+<hr class="dark_hr">
+<div class="row">
+    <div class="col-md-6">
+        <p>
+            {% if game[0].average_rating == 1 %}
+                <i class="fa fa-star fa-4x"></i>
+            {% elif game[0].average_rating == 2 %}
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+            {% elif game[0].average_rating == 3 %}
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+            {% elif game[0].average_rating == 4 %}
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+            {% elif game[0].average_rating == 5 %}
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
+                <i class="fa fa-star fa-4x"></i>
             {% endif %}
-        </div>
+        </p>
+        <img src="{{game[1].url}}" alt="{{game[1].alt_text}}" width="100%">
     </div>
+    <div class="col-md-6">
+        <h2><strong>System:</strong></h2>
+        <p>{{game[2].name}}</p>
+        <h3><strong>Publisher:</strong></h3>
+        <p>{{game[3].name}}</p>
+        <h4><strong>Description:</strong></h4>
+        <p>{{game[0].description}}</p>
+        <h4><strong>Article Created:</strong></h4>
+        <p>{{game[0].created_date}}</p>
+        <h4><strong>Creator:</strong></h4>
+        <p><img src="{{game[4].picture}}" class="profile-pic"> {{game[4].name}}</p>
+        {% if game[0].edited_date %}
+            <h4><strong>Edited on:</strong></h4>
+            <p>{{game[0].edited_date}}</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

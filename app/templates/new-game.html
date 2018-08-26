@@ -10,18 +10,15 @@
         </div>
         <div class="form-group">
             <label for="description">Description</label>
-            <input type="text" class="form-control" name="description" 
-            placeholder="Description of the game's plot and gameplay" required>
+            <input type="text" class="form-control" name="description" placeholder="Description of the game's plot and gameplay" required>
         </div>
         <div class="form-group">
             <label for="year_released">Release Year</label>
-            <input type="text" class="form-control" name="year_released" 
-            placeholder="Year the game was released" required>
+            <input type="text" class="form-control" name="year_released" placeholder="Year the game was released" required>
         </div>
         <div class="form-group">
             <label for="intial_rating">Rating</label>
-            <input type="number" class="form-control" name="initial_rating" 
-            min="1" max="5" step="1" placeholder="Rating 1 thru 5" required>
+            <input type="number" class="form-control" name="initial_rating" min="1" max="5" step="1" placeholder="Rating 1 thru 5" required>
         </div>
     </fieldset>
 
@@ -53,7 +50,7 @@
 
     <fieldset>
         <legend>Game System</legend>
-        <div class="form-group" id="system_drop_down">                
+        <div class="form-group" id="system_drop_down">
             <select class="form-control" name="system">
                 <option value="" disabled selected>Select the game system</option>
                 {% for system in systems %}
@@ -67,5 +64,4 @@
     <br>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-<script src="{{ url_for('static', filename='js/new_game.js' ) }}"></script>
-{% endblock %}
+<script src="{{ url_for('static', filename='js/new_game.js' ) }}"></script> {% endblock %}

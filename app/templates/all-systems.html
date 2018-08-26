@@ -3,18 +3,18 @@
 {% if 'username' in session %}
     <a href="{{ url_for('newSystem') }}"><button class="btn btn-primary">Add a System</button></a>
 {% endif %}
-    <h1 class="page_title">Systems</h1>
-    <hr class="dark_hr">
-    <div class="row row-top-buffer">
-    {% for system in systems %}
-        <div class="col-md-2 box">
-            <a href="{{ url_for('editSystem', system_id=system[0].id) }}">
-                <img src="{{system[1].url}}" alt="{{system[1].alt_text}}" width="50px">
-                <h6><strong>ID:</strong> {{system[0].id}}</h6>
-                <h6><strong>Name:</strong> {{system[0].name}}</h6>
-                <h6><strong>Released:</strong> {{system[0].year_released}}</h6>
-            </a>
-        </div>
-    {% endfor %}
+<h1 class="page_title">Systems</h1>
+<hr class="dark_hr">
+<div class="row row-top-buffer">
+{% for system in systems %}
+    <div class="col-md-2 box">
+        <a href="{{ url_for('editSystem', system_id=system[0].id) }}">
+            <img src="{{system[1].url}}" alt="{{system[1].alt_text}}" width="50px">
+            <h6><strong>ID:</strong> {{system[0].id}}</h6>
+            <h6><strong>Name:</strong> {{system[0].name}}</h6>
+            <h6><strong>Released:</strong> {{system[0].year_released}}</h6>
+        </a>
     </div>
+{% endfor %}
+</div>
 {% endblock %}

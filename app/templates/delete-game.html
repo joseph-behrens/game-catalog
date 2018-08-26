@@ -1,12 +1,12 @@
 {% extends "main.html" %}
 {% block content %}
-    <h1>Delete {{game.title}}</h1>
-    <h5>ID: {{game.id}}</h5>
-    <h5>Description: {{game.description}}</h5>
-    <h5>Created: {{game.created_date}}</h5>
-    <h2>Are you sure?</h2>
-    <form method="POST" action="#" id="new_game" autocomplete="off">    
-        <button type="submit" class="btn btn-danger">DELETE</button>
-        <a class="btn btn-primary" href="{{ url_for('game', game_id=game.id) }}">Cancel</a>
-    </form>
+<h1>Delete {{game.title}}</h1>
+<h5>ID: {{game.id}}</h5>
+<h5>Description: {{game.description}}</h5>
+<h5>Created: {{game.created_date}}</h5>
+<h2>Are you sure?</h2>
+<form method="POST" action="#" id="new_game" autocomplete="off">
+    <button type="submit" class="btn btn-danger">DELETE</button>
+    <a class="btn btn-primary" href="{{ url_for('game', game_id=game.id) }}">Cancel</a>
+</form>
 {% endblock %}

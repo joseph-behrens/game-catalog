@@ -1,0 +1,174 @@
+{% extends "main.html" %}
+{% block content %}
+<h1 class="page_title">Using API Version 1</h1>
+<hr class="dark_hr">
+<h2>Games</h2>
+<p>To retrieve a list of all games currently saved in the system.</p>
+<a href="http://{{ request.host }}/api/v1/games">http://{{ request.host }}/api/v1/games</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "games": [
+        {
+        "average_rating": 4, 
+        "created_date": "Sun, 19 Aug 2018 04:49:47 GMT", 
+        "description": "the third main installment of The Legend of Zelda series, and the first and only one for the Super Nintendo Entertainment System. After the side-scrolling and more RPG-like gameplay of The Adventure of Link, A Link to the Past was a return to the overhead view and gameplay style of The Legend of Zelda. It introduced the concept of two different worlds (one dark, one light), which was revisited to an extent in its console successor Ocarina of Time with two time periods rather than dark and light worlds.", 
+        "edited_date": null, 
+        "id": 3, 
+        "image_id": 5, 
+        "owner_id": 1, 
+        "publisher_id": 5, 
+        "system_id": 3, 
+        "title": "Legend of Zelda: A Link to the Past", 
+        "year_released": 1992
+        }
+    ]
+}
+</pre>
+
+<br><br>
+<hr class="dark_hr">
+<h2>Companies</h2>
+<p>To retrieve a list of all companies currently saved in the system. 
+    This is an unfiltered list and will show manufacturers combined with publishers.</p>
+<a href="http://{{ request.host }}/api/v1/companies">http://{{ request.host }}/api/v1/companies</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "companies": [
+        {
+        "company_type": "publisher", 
+        "country": "CA", 
+        "id": 3, 
+        "image_id": 3, 
+        "name": "Electronic Arts"
+        }, 
+        {
+        "company_type": "manufacturer", 
+        "country": "JP", 
+        "id": 4, 
+        "image_id": 4, 
+        "name": "Nintendo"
+        }, 
+        {
+        "company_type": "publisher", 
+        "country": "JP", 
+        "id": 5, 
+        "image_id": 4, 
+        "name": "Nintendo"
+        }
+    ]
+}
+</pre>
+
+<br><br>
+<hr class="dark_hr">
+<h2>Manufacturers</h2>
+<p>A list of companies filtered by manufacturers.</p>
+<a href="http://{{ request.host }}/api/v1/manufacturers">http://{{ request.host }}/api/v1/manufacturers</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "manufacturers": [
+        {
+        "company_type": "manufacturer", 
+        "country": "JP", 
+        "id": 4, 
+        "image_id": 4, 
+        "name": "Nintendo"
+        }, 
+        {
+        "company_type": "manufacturer", 
+        "country": "AF", 
+        "id": 7, 
+        "image_id": 9, 
+        "name": "Various"
+        }
+    ]
+}
+</pre>
+
+<br><br>
+<hr class="dark_hr">
+<h2>Publishers</h2>
+<p>A list of companies filtered by publishers.</p>
+<a href="http://{{ request.host }}/api/v1/publishers">http://{{ request.host }}/api/v1/publishers</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "publishers": [
+        {
+        "company_type": "publisher", 
+        "country": "CA", 
+        "id": 3, 
+        "image_id": 3, 
+        "name": "Electronic Arts"
+        }, 
+        {
+        "company_type": "publisher", 
+        "country": "JP", 
+        "id": 5, 
+        "image_id": 4, 
+        "name": "Nintendo"
+        }
+    ]
+}
+</pre>
+
+<br><br>
+<hr class="dark_hr">
+<h2>Systems</h2>
+<p>A list of all gaming systems.</p>
+<a href="http://{{ request.host }}/api/v1/systems">http://{{ request.host }}/api/v1/systems</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "systems": [
+        {
+        "description": "The greatest gaming system ever made. Changed the face of gaming.", 
+        "id": 2, 
+        "image_id": 4, 
+        "manufacturer_id": 4, 
+        "name": "NES (Nintendo Entertainment System)", 
+        "year_released": 1984
+        }, 
+        {
+        "description": "The upgraded 16 bit Ninendo", 
+        "id": 3, 
+        "image_id": 6, 
+        "manufacturer_id": null, 
+        "name": "SNES (Super Nintendo)", 
+        "year_released": 1990
+        }
+    ]
+}
+</pre>
+
+<br><br>
+<hr class="dark_hr">
+<h2>Images</h2>
+<p>A list of all images.</p>
+<a href="http://{{ request.host }}/api/v1/images">http://{{ request.host }}/api/v1/images</a>
+<h3>Sample Output</h3>
+<pre>     	
+{
+    "images": [
+        {
+        "alt_text": "A boy and his blob", 
+        "id": 1, 
+        "url": "https://upload.wikimedia.org/wikipedia/en/3/39/A_Boy_and_His_Blob_%28cover_artwork%29.jpg"
+        }, 
+        {
+        "alt_text": "EA Image", 
+        "id": 3, 
+        "url": "https://vignette.wikia.nocookie.net/jamesbond/images/0/02/Electronic-arts-ea-logo.jpg/revision/latest/scale-to-width-down/640?cb=20161120175238"
+        }, 
+        {
+        "alt_text": "Nintendo", 
+        "id": 4, 
+        "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Nintendo_red_logo.svg"
+        }
+    ]
+}
+</pre>
+{% endblock %}

@@ -1,13 +1,13 @@
 {% extends "main.html" %}
 {% block content %}
-    <h1>Delete Manufacturer {{manufacturer.name}}</h1>
-    <h5><strong>ID:</strong> {{manufacturer.id}}</h5>
-    <h5><strong>Name:</strong>: {{manufacturer.name}}</h5>
-    <h5><strong>Country:</strong>: {{manufacturer.country}}</h5>
-    <h5><strong>Founded:</strong>: {{manufacturer.year_founded}}</h5>
-    <h2>Are you sure?</h2>
-    <form method="POST" action="#" autocomplete="off">    
-        <button type="submit" class="btn btn-danger">DELETE</button>
-        <a class="btn btn-primary" href="{{ url_for('allManufacturers') }}">Cancel</a>
-    </form>
+<h1>Delete Manufacturer {{manufacturer.name}}</h1>
+<h5><strong>ID:</strong> {{manufacturer.id}}</h5>
+<h5><strong>Name:</strong>: {{manufacturer.name}}</h5>
+<h5><strong>Country:</strong>: {{manufacturer.country}}</h5>
+<h5><strong>Founded:</strong>: {{manufacturer.year_founded}}</h5>
+<h2>Are you sure?</h2>
+<form method="POST" action="#" autocomplete="off">
+    <button type="submit" class="btn btn-danger">DELETE</button>
+    <a class="btn btn-primary" href="{{ url_for('allManufacturers') }}">Cancel</a>
+</form>
 {% endblock %}
