@@ -15,6 +15,16 @@ secret_key = ''.join(
     for x in range(32))
 
 
+class User(Base):
+    """Site users for logins."""
+
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, index=True)
+    email = Column(String)
+    picture = Column(String(250))
+
+
 class Image(Base):
     """Images used for logos of companies and games."""
 
@@ -22,6 +32,8 @@ class Image(Base):
     id = Column(Integer, primary_key=True)
     url = Column(String)
     alt_text = Column(String)
+    owner_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
@@ -52,6 +64,8 @@ class Company(Base):
     country = Column(String(32))
     image_id = Column(Integer, ForeignKey('image.id'))
     image = relationship(Image)
+    owner_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
     company_type = Column(String(32), nullable=False)
     __mapper_args__ = {'polymorphic_on': company_type}
 
@@ -87,6 +101,7 @@ class Publisher(Company):
 class Developer(Company):
     """
     Game development companies such as Bethesda, BioWare, Valve, etc.
+    
     Not currently used. But here as it is planned.
     """
 
@@ -105,6 +120,8 @@ class System(Base):
     description = Column(String)
     year_released = Column(Integer)
     image_id = Column(Integer, ForeignKey('image.id'))
+    owner_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
     image = relationship(Image)
     manufacturer = relationship(Manufacturer)
 
@@ -119,16 +136,6 @@ class System(Base):
             'year_released': self.year_released,
             'image_id': self.image_id
         }
-
-
-class User(Base):
-    """Site users for logins."""
-
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, index=True)
-    email = Column(String)
-    picture = Column(String(250))
 
 
 class Role(Base):

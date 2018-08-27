@@ -1,5 +1,16 @@
 {% extends "main.html" %}
 {% block content %}
+<div class="flash">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li><strong>{{ message }}</strong></li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
 {% if 'username' in session %}
     <a href="{{ url_for('newImage') }}"><button class="btn btn-primary">Add an Image</button></a>
 {% endif %}
