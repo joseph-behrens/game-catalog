@@ -3,7 +3,7 @@
 *.rsa
 .vscode
 client_secrets.json
-
+.vagrant
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

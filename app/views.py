@@ -27,9 +27,14 @@ from googleapiclient.discovery import build
 from functools import wraps
 
 
+# Import API package
+from api.api import api
+
+
 # Setup application to use Google OAuth
 auth = HTTPBasicAuth()
 app = Flask(__name__)
+app.register_blueprint(api)
 app.secret_key = secret_key
 app.config.update(dict(PREFERRED_URL_SCHEME='https'))
 oauth2 = UserOAuth2()
@@ -712,65 +717,10 @@ def deleteManufacturer(manufacturer_id):
 # endregion
 
 
-# region API Calls
 @app.route('/api-info')
 def apiInfo():
     """Give instructions on using the api calls."""
     return render_template('api-info.html')
-
-
-@app.route('/api/v1/games')
-def gamesList():
-    """Retrieve JSON of all game objects."""
-    with session_scope() as session:
-        games = session.query(Game).all()
-        return jsonify(games=[game.serialize for game in games])
-
-
-@app.route('/api/v1/companies')
-def companyList():
-    """Retrieve JSON of all company objects unfiltered."""
-    with session_scope() as session:
-        companies = session.query(Company).all()
-        return jsonify(companies=[
-                company.serialize for company in companies])
-
-
-@app.route('/api/v1/manufacturers')
-def manufacturerList():
-    """Retrieve JSON of all manufacturer company objects."""
-    with session_scope() as session:
-        manufacturers = session.query(Company).filter_by(
-            company_type='manufacturer').all()
-        return jsonify(manufacturers=[
-                manufacturer.serialize for manufacturer in manufacturers])
-
-
-@app.route('/api/v1/publishers')
-def publisherList():
-    """Retrieve JSON of all publisher company objects."""
-    with session_scope() as session:
-        publishers = session.query(Company).filter_by(
-            company_type='publisher').all()
-        return jsonify(publishers=[
-            publisher.serialize for publisher in publishers])
-
-
-@app.route('/api/v1/systems')
-def systemList():
-    """Retrieve JSON of all system objects."""
-    with session_scope() as session:
-        systems = session.query(System).all()
-        return jsonify(systems=[system.serialize for system in systems])
-
-
-@app.route('/api/v1/images')
-def imageList():
-    """Retrieve JSON of all image objects."""
-    with session_scope() as session:
-        images = session.query(Image).all()
-        return jsonify(images=[image.serialize for image in images])
-# endregion
 
 
 if __name__ == '__main__':
